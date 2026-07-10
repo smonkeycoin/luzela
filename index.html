@@ -6,15 +6,15 @@
     <title>Luzela | Experience v1.0</title>
     <meta
       name="description"
-      content="Una experiencia cinematografica de Luzela: proteccion solar mineral para dias de sol, agua y familia."
+      content="Una experiencia cinematográfica de Luzela: protección solar mineral para días de sol, agua y familia."
     />
     <meta property="og:title" content="Luzela | La tranquilidad de disfrutar el sol" />
     <meta
       property="og:description"
-      content="Proteccion solar mineral, vegana, libre de grasa y hecha en Mexico."
+      content="Protección solar mineral, vegana, libre de grasa y hecha en México."
     />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="assets/ai-production/02-shots/SHOT_008_The_Discovery.png" />
+    <meta property="og:image" content="assets/web/desktop/SHOT_008_The_Discovery.webp" />
     <meta name="theme-color" content="#F8F4EA" />
     <link rel="icon" href="assets/ai-production/00 Brand DNA/favicon.png" />
     <link
@@ -31,8 +31,22 @@
       type="font/ttf"
       crossorigin
     />
-    <link rel="preload" as="image" href="assets/ai-production/02-shots/SHOT_001_Hero_Close.png" />
-    <link rel="preload" as="image" href="assets/ai-production/02-shots/SHOT_002_Hero_Wide.png" />
+    <link
+      rel="preload"
+      as="image"
+      type="image/avif"
+      href="assets/web/desktop/SHOT_001_Hero_Close.avif"
+      imagesrcset="assets/web/mobile/SHOT_001_Hero_Close.avif 828w, assets/web/desktop/SHOT_001_Hero_Close.avif 1122w"
+      imagesizes="100vw"
+    />
+    <link
+      rel="preload"
+      as="image"
+      type="image/avif"
+      href="assets/web/desktop/SHOT_002_Hero_Wide.avif"
+      imagesrcset="assets/web/mobile/SHOT_002_Hero_Wide.avif 828w, assets/web/desktop/SHOT_002_Hero_Wide.avif 1672w"
+      imagesizes="100vw"
+    />
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -40,14 +54,16 @@
     <div class="scroll-progress" aria-hidden="true"><span data-progress-bar></span></div>
 
     <header class="quiet-nav" data-quiet-nav aria-label="Luzela">
-      <a class="quiet-logo-link" href="#top" aria-label="Volver al inicio">
-        <img src="assets/ai-production/00 Brand DNA/logo-luzela-transparent.png" alt="Luzela" />
+      <a class="quiet-logo-link wordmark" href="#top" aria-label="Volver al inicio">
+        <span>LUZELA</span>
+        <small>méxico</small>
       </a>
       <a
         class="quiet-buy-link"
-        href="https://luzelaskincare.godaddysites.com/tienda"
+        href="#buy"
+        data-scroll-buy
         data-event="click_buy"
-        aria-label="Comprar Luzela en tienda oficial"
+        aria-label="Ir al bloque de compra de Luzela"
         >Comprar</a
       >
     </header>
@@ -59,79 +75,103 @@
             <figure
               class="shot-layer shot-close"
               data-shot="SHOT_001"
-              data-src="assets/ai-production/02-shots/SHOT_001_Hero_Close.png"
+              data-src="assets/web/desktop/SHOT_001_Hero_Close.avif" data-src-mobile="assets/web/mobile/SHOT_001_Hero_Close.avif"
               data-start="0"
               data-end="8"
               data-scale-start="1.02"
               data-scale-end="1"
             >
-              <img src="assets/ai-production/02-shots/SHOT_001_Hero_Close.png" alt="" fetchpriority="high" />
+              <picture>
+                <source type="image/avif" srcset="assets/web/mobile/SHOT_001_Hero_Close.avif 828w, assets/web/desktop/SHOT_001_Hero_Close.avif 1122w" sizes="100vw" />
+                <source type="image/webp" srcset="assets/web/mobile/SHOT_001_Hero_Close.webp 828w, assets/web/desktop/SHOT_001_Hero_Close.webp 1122w" sizes="100vw" />
+                <img src="assets/web/desktop/SHOT_001_Hero_Close.webp" alt="" fetchpriority="high" />
+              </picture>
             </figure>
 
             <figure
               class="shot-layer shot-wide"
               data-shot="SHOT_002"
-              data-src="assets/ai-production/02-shots/SHOT_002_Hero_Wide.png"
+              data-src="assets/web/desktop/SHOT_002_Hero_Wide.avif" data-src-mobile="assets/web/mobile/SHOT_002_Hero_Wide.avif"
               data-start="8"
               data-end="18"
               data-scale-start="1"
               data-scale-end="1.04"
             >
-              <img src="assets/ai-production/02-shots/SHOT_002_Hero_Wide.png" alt="" fetchpriority="high" />
+              <picture>
+                <source type="image/avif" srcset="assets/web/mobile/SHOT_002_Hero_Wide.avif 828w, assets/web/desktop/SHOT_002_Hero_Wide.avif 1672w" sizes="100vw" />
+                <source type="image/webp" srcset="assets/web/mobile/SHOT_002_Hero_Wide.webp 828w, assets/web/desktop/SHOT_002_Hero_Wide.webp 1672w" sizes="100vw" />
+                <img src="assets/web/desktop/SHOT_002_Hero_Wide.webp" alt="" fetchpriority="high" />
+              </picture>
             </figure>
 
             <figure
               class="shot-layer shot-walk"
               data-shot="SHOT_003"
-              data-src="assets/ai-production/02-shots/SHOT_003_The_Walk.png"
+              data-src="assets/web/desktop/SHOT_003_The_Walk.avif" data-src-mobile="assets/web/mobile/SHOT_003_The_Walk.avif"
               data-start="18"
               data-end="28"
               data-scale-start="1.01"
               data-scale-end="1.03"
             >
-              <img src="assets/ai-production/02-shots/SHOT_003_The_Walk.png" alt="" loading="lazy" />
+              <picture>
+                <source type="image/avif" srcset="assets/web/mobile/SHOT_003_The_Walk.avif 828w, assets/web/desktop/SHOT_003_The_Walk.avif 1672w" sizes="100vw" />
+                <source type="image/webp" srcset="assets/web/mobile/SHOT_003_The_Walk.webp 828w, assets/web/desktop/SHOT_003_The_Walk.webp 1672w" sizes="100vw" />
+                <img src="assets/web/desktop/SHOT_003_The_Walk.webp" alt="" loading="lazy" />
+              </picture>
             </figure>
 
             <figure
               class="shot-layer shot-sun"
               data-shot="SHOT_003B"
-              data-src="assets/ai-production/02-shots/SHOT_003B_The_Sun.png"
+              data-src="assets/web/desktop/SHOT_003B_The_Sun.avif" data-src-mobile="assets/web/mobile/SHOT_003B_The_Sun.avif"
               data-start="28"
               data-end="38"
               data-scale-start="1"
               data-scale-end="1.01"
             >
-              <img src="assets/ai-production/02-shots/SHOT_003B_The_Sun.png" alt="" loading="lazy" />
+              <picture>
+                <source type="image/avif" srcset="assets/web/mobile/SHOT_003B_The_Sun.avif 828w, assets/web/desktop/SHOT_003B_The_Sun.avif 1672w" sizes="100vw" />
+                <source type="image/webp" srcset="assets/web/mobile/SHOT_003B_The_Sun.webp 828w, assets/web/desktop/SHOT_003B_The_Sun.webp 1672w" sizes="100vw" />
+                <img src="assets/web/desktop/SHOT_003B_The_Sun.webp" alt="" loading="lazy" />
+              </picture>
             </figure>
 
             <figure
               class="shot-layer shot-arm"
               data-shot="SHOT_004"
-              data-src="assets/ai-production/02-shots/SHOT_004_The_Arm_Master.png"
+              data-src="assets/web/desktop/SHOT_004_The_Arm_Master.avif" data-src-mobile="assets/web/mobile/SHOT_004_The_Arm_Master.avif"
               data-start="38"
               data-end="52"
               data-scale-start="1"
               data-scale-end="1"
             >
-              <img src="assets/ai-production/02-shots/SHOT_004_The_Arm_Master.png" alt="" loading="lazy" />
+              <picture>
+                <source type="image/avif" srcset="assets/web/mobile/SHOT_004_The_Arm_Master.avif 828w, assets/web/desktop/SHOT_004_The_Arm_Master.avif 1672w" sizes="100vw" />
+                <source type="image/webp" srcset="assets/web/mobile/SHOT_004_The_Arm_Master.webp 828w, assets/web/desktop/SHOT_004_The_Arm_Master.webp 1672w" sizes="100vw" />
+                <img src="assets/web/desktop/SHOT_004_The_Arm_Master.webp" alt="" loading="lazy" />
+              </picture>
             </figure>
 
             <figure
               class="shot-layer shot-texture"
               data-shot="SHOT_005"
-              data-src="assets/ai-production/02-shots/SHOT_005_The_Texture.png"
+              data-src="assets/web/desktop/SHOT_005_The_Texture.avif" data-src-mobile="assets/web/mobile/SHOT_005_The_Texture.avif"
               data-start="52"
               data-end="64"
               data-scale-start="1"
               data-scale-end="1"
             >
-              <img src="assets/ai-production/02-shots/SHOT_005_The_Texture.png" alt="" loading="lazy" />
+              <picture>
+                <source type="image/avif" srcset="assets/web/mobile/SHOT_005_The_Texture.avif 828w, assets/web/desktop/SHOT_005_The_Texture.avif 1672w" sizes="100vw" />
+                <source type="image/webp" srcset="assets/web/mobile/SHOT_005_The_Texture.webp 828w, assets/web/desktop/SHOT_005_The_Texture.webp 1672w" sizes="100vw" />
+                <img src="assets/web/desktop/SHOT_005_The_Texture.webp" alt="" loading="lazy" />
+              </picture>
             </figure>
 
             <figure
               class="shot-layer shot-touch"
               data-shot="SHOT_006"
-              data-src="assets/ai-production/02-shots/SHOT_006_FIRST_TOUCH.png"
+              data-src="assets/web/desktop/SHOT_006_FIRST_TOUCH.avif" data-src-mobile="assets/web/mobile/SHOT_006_FIRST_TOUCH.avif"
               data-start="64"
               data-end="72"
               data-scale-start="1"
@@ -139,13 +179,17 @@
               data-blur-start="0"
               data-blur-end="2"
             >
-              <img src="assets/ai-production/02-shots/SHOT_006_FIRST_TOUCH.png" alt="" loading="lazy" />
+              <picture>
+                <source type="image/avif" srcset="assets/web/mobile/SHOT_006_FIRST_TOUCH.avif 828w, assets/web/desktop/SHOT_006_FIRST_TOUCH.avif 1672w" sizes="100vw" />
+                <source type="image/webp" srcset="assets/web/mobile/SHOT_006_FIRST_TOUCH.webp 828w, assets/web/desktop/SHOT_006_FIRST_TOUCH.webp 1672w" sizes="100vw" />
+                <img src="assets/web/desktop/SHOT_006_FIRST_TOUCH.webp" alt="" loading="lazy" />
+              </picture>
             </figure>
 
             <figure
               class="shot-layer shot-underwater"
               data-shot="SHOT_007A"
-              data-src="assets/ai-production/02-shots/SHOT_007A_UNDERWATER.png"
+              data-src="assets/web/desktop/SHOT_007A_UNDERWATER.avif" data-src-mobile="assets/web/mobile/SHOT_007A_UNDERWATER.avif"
               data-start="72"
               data-end="82"
               data-scale-start="1.02"
@@ -154,13 +198,17 @@
               data-blur-end="0"
               data-mask="true"
             >
-              <img src="assets/ai-production/02-shots/SHOT_007A_UNDERWATER.png" alt="" loading="lazy" />
+              <picture>
+                <source type="image/avif" srcset="assets/web/mobile/SHOT_007A_UNDERWATER.avif 828w, assets/web/desktop/SHOT_007A_UNDERWATER.avif 1672w" sizes="100vw" />
+                <source type="image/webp" srcset="assets/web/mobile/SHOT_007A_UNDERWATER.webp 828w, assets/web/desktop/SHOT_007A_UNDERWATER.webp 1672w" sizes="100vw" />
+                <img src="assets/web/desktop/SHOT_007A_UNDERWATER.webp" alt="" loading="lazy" />
+              </picture>
             </figure>
 
             <figure
               class="shot-layer shot-rise"
               data-shot="SHOT_007B"
-              data-src="assets/ai-production/02-shots/SHOT_007B_UNDERWATER_RISE.png"
+              data-src="assets/web/desktop/SHOT_007B_UNDERWATER_RISE.avif" data-src-mobile="assets/web/mobile/SHOT_007B_UNDERWATER_RISE.avif"
               data-start="82"
               data-end="90"
               data-scale-start="1.03"
@@ -168,19 +216,27 @@
               data-blur-start="4"
               data-blur-end="0"
             >
-              <img src="assets/ai-production/02-shots/SHOT_007B_UNDERWATER_RISE.png" alt="" loading="lazy" />
+              <picture>
+                <source type="image/avif" srcset="assets/web/mobile/SHOT_007B_UNDERWATER_RISE.avif 828w, assets/web/desktop/SHOT_007B_UNDERWATER_RISE.avif 1672w" sizes="100vw" />
+                <source type="image/webp" srcset="assets/web/mobile/SHOT_007B_UNDERWATER_RISE.webp 828w, assets/web/desktop/SHOT_007B_UNDERWATER_RISE.webp 1672w" sizes="100vw" />
+                <img src="assets/web/desktop/SHOT_007B_UNDERWATER_RISE.webp" alt="" loading="lazy" />
+              </picture>
             </figure>
 
             <figure
               class="shot-layer shot-discovery"
               data-shot="SHOT_008"
-              data-src="assets/ai-production/02-shots/SHOT_008_The_Discovery.png"
+              data-src="assets/web/desktop/SHOT_008_The_Discovery.avif" data-src-mobile="assets/web/mobile/SHOT_008_The_Discovery.avif"
               data-start="90"
               data-end="100"
               data-scale-start="1.03"
               data-scale-end="1"
             >
-              <img src="assets/ai-production/02-shots/SHOT_008_The_Discovery.png" alt="" loading="lazy" />
+              <picture>
+                <source type="image/avif" srcset="assets/web/mobile/SHOT_008_The_Discovery.avif 828w, assets/web/desktop/SHOT_008_The_Discovery.avif 1672w" sizes="100vw" />
+                <source type="image/webp" srcset="assets/web/mobile/SHOT_008_The_Discovery.webp 828w, assets/web/desktop/SHOT_008_The_Discovery.webp 1672w" sizes="100vw" />
+                <img src="assets/web/desktop/SHOT_008_The_Discovery.webp" alt="" loading="lazy" />
+              </picture>
             </figure>
           </div>
 
@@ -189,11 +245,11 @@
 
           <div class="copy-layer" aria-live="polite">
             <p class="cue cue-left" data-film-cue data-start="9" data-end="17">
-              Hay lugares que merecen seguir siendo asi.
+              Hay lugares que merecen seguir siendo así.
             </p>
-            <p class="cue cue-left" data-film-cue data-start="20" data-end="27">Y pieles que tambien.</p>
+            <p class="cue cue-left" data-film-cue data-start="20" data-end="27">Y pieles que también.</p>
             <p class="cue cue-left" data-film-cue data-start="32" data-end="36">
-              Hay dias que no deberian preocuparte.
+              Hay días que no deberían preocuparte.
             </p>
             <p class="cue cue-left cue-small" data-film-cue data-start="36" data-end="40">Solo disfrutarse.</p>
             <p class="cue cue-left" data-film-cue data-start="54" data-end="58">
@@ -202,103 +258,92 @@
             <p class="cue cue-left cue-small" data-film-cue data-start="58" data-end="61">No grasa.</p>
             <p class="cue cue-left cue-small" data-film-cue data-start="61" data-end="64">Solo piel.</p>
             <p class="cue cue-center cue-water" data-film-cue data-start="74" data-end="78">
-              Disenado para cuidar tu piel.
+              Diseñado para cuidar tu piel.
             </p>
             <p class="cue cue-center cue-water cue-water-second" data-film-cue data-start="78" data-end="82">
               Sin olvidarse del lugar donde la disfrutas.
             </p>
 
             <div class="final-copy" data-final-copy>
-              <img
-                class="final-logo"
-                src="assets/ai-production/00 Brand DNA/logo-luzela-transparent.png"
-                alt="Luzela Mexico"
-                data-film-cue
-                data-start="91"
-                data-end="100"
-              />
-              <p class="final-line" data-film-cue data-start="93" data-end="100">Proteccion solar mineral.</p>
+              <div class="final-logo wordmark" data-film-cue data-start="91" data-end="100" aria-label="Luzela México">
+                <span>LUZELA</span>
+                <small>méxico</small>
+              </div>
+              <p class="final-line" data-film-cue data-start="93" data-end="100">Protección solar mineral.</p>
               <p class="final-line final-memory" data-film-cue data-start="95" data-end="100">
-                Hecha para los dias que si quieres recordar.
+                Hecha para los días que sí quieres recordar.
               </p>
             </div>
+          </div>
+
+          <div class="first-scroll-cue" data-first-scroll-cue aria-hidden="true">
+            <span></span>
+            <p>Continúa</p>
           </div>
         </div>
       </section>
 
-      <section class="commerce" data-commerce aria-label="ACT II - Why Luzela">
-        <article class="chapter chapter-problem" data-commerce-chapter data-chapter="THE_PROBLEM">
-          <div class="chapter-stage">
-            <figure class="chapter-media chapter-media-full" aria-hidden="true">
-              <img src="assets/ai-production/02-shots/SHOT_004_The_Arm_Master.png" alt="" loading="lazy" />
-            </figure>
-            <div class="chapter-veil chapter-veil-dark" aria-hidden="true"></div>
-            <div class="chapter-copy chapter-copy-left chapter-copy-light">
-              <p class="chapter-kicker">ACT II - WHY LUZELA</p>
-              <h1>A veces, protegerse se siente pesado.</h1>
-              <p data-commerce-step="0.28">A veces, reaplicar deja de ser sencillo.</p>
-              <p data-commerce-step="0.52">Y entonces el cuidado empieza a interrumpir el dia.</p>
-            </div>
-          </div>
-        </article>
-
+      <section class="commerce" data-commerce aria-label="Por qué Luzela">
         <article class="chapter chapter-why" data-commerce-chapter data-chapter="WHY_LUZELA">
           <div class="chapter-stage chapter-stage-paper">
-            <div class="product-still product-still-soft" aria-hidden="true">
-              <img src="assets/ai-production/03 Product/product_white.png" alt="" loading="lazy" />
+            <div class="routine-scenes" aria-hidden="true">
+              <figure class="routine-scene routine-scene-beach">
+                <picture>
+                  <source type="image/avif" srcset="assets/web/mobile/morning_routine.avif 828w, assets/web/desktop/morning_routine.avif 1672w" sizes="(max-width: 759px) 43vw, 38vw" />
+                  <source type="image/webp" srcset="assets/web/mobile/morning_routine.webp 828w, assets/web/desktop/morning_routine.webp 1672w" sizes="(max-width: 759px) 43vw, 38vw" />
+                  <img src="assets/web/desktop/morning_routine.webp" alt="" loading="lazy" />
+                </picture>
+                <figcaption>Morning Routine</figcaption>
+              </figure>
+              <figure class="routine-scene routine-scene-walk">
+                <picture>
+                  <source type="image/avif" srcset="assets/web/mobile/MID_DAY_TABLET.avif 828w, assets/web/desktop/MID_DAY_TABLET.avif 1672w" sizes="(max-width: 759px) 43vw, 38vw" />
+                  <source type="image/webp" srcset="assets/web/mobile/MID_DAY_TABLET.webp 828w, assets/web/desktop/MID_DAY_TABLET.webp 1672w" sizes="(max-width: 759px) 43vw, 38vw" />
+                  <img src="assets/web/desktop/MID_DAY_TABLET.webp" alt="" loading="lazy" />
+                </picture>
+                <figcaption>Midday</figcaption>
+              </figure>
+              <figure class="routine-scene routine-scene-life">
+                <picture>
+                  <source type="image/avif" srcset="assets/web/mobile/MID_DAY_CAR.avif 828w, assets/web/desktop/MID_DAY_CAR.avif 1536w" sizes="(max-width: 759px) 43vw, 38vw" />
+                  <source type="image/webp" srcset="assets/web/mobile/MID_DAY_CAR.webp 828w, assets/web/desktop/MID_DAY_CAR.webp 1536w" sizes="(max-width: 759px) 43vw, 38vw" />
+                  <img src="assets/web/desktop/MID_DAY_CAR.webp" alt="" loading="lazy" />
+                </picture>
+                <figcaption>Between Places</figcaption>
+              </figure>
+              <figure class="routine-scene routine-scene-sky">
+                <picture>
+                  <source type="image/avif" srcset="assets/web/mobile/CITY_001_FINAL.avif 828w, assets/web/desktop/CITY_001_FINAL.avif 1672w" sizes="(max-width: 759px) 43vw, 38vw" />
+                  <source type="image/webp" srcset="assets/web/mobile/CITY_001_FINAL.webp 828w, assets/web/desktop/CITY_001_FINAL.webp 1672w" sizes="(max-width: 759px) 43vw, 38vw" />
+                  <img src="assets/web/desktop/CITY_001_FINAL.webp" alt="" loading="lazy" />
+                </picture>
+                <figcaption>City</figcaption>
+              </figure>
             </div>
             <div class="chapter-copy chapter-copy-right">
-              <p class="chapter-kicker">WHY LUZELA</p>
-              <h2>
-                Luzela existe para que proteger tu piel no interrumpa tus dias de sol.
-              </h2>
-              <p>
-                Una formula 100% mineral, vegana, libre de grasa, Ocean &amp; Cenote Friendly y
-                hecha en Mexico para sentirse ligera en piel real.
-              </p>
-              <div class="quiet-claims" aria-label="Beneficios Luzela">
-                <span data-commerce-step="0.16">100% mineral</span>
-                <span data-commerce-step="0.3">Libre de grasa</span>
-                <span data-commerce-step="0.44">Vegano</span>
-                <span data-commerce-step="0.58">Ocean &amp; Cenote Friendly</span>
-                <span data-commerce-step="0.72">Hecho en Mexico</span>
-              </div>
+              <p class="chapter-kicker">Protección ligera, estés donde estés</p>
+              <h2>Protección ligera para todos los días de sol.</h2>
+              <p data-commerce-step="0.22">De la mañana al medio día.</p>
+              <p data-commerce-step="0.4">Del coche a la caminata.</p>
+              <p data-commerce-step="0.58">De la ciudad a los días nublados.</p>
             </div>
-          </div>
-        </article>
-
-        <article class="chapter chapter-difference" data-commerce-chapter data-chapter="THE_DIFFERENCE">
-          <div class="chapter-stage">
-            <figure class="chapter-media chapter-media-full difference-a" aria-hidden="true">
-              <img src="assets/ai-production/02-shots/SHOT_004_The_Arm_Master.png" alt="" loading="lazy" />
-            </figure>
-            <figure class="chapter-media chapter-media-full difference-b" aria-hidden="true">
-              <img src="assets/ai-production/02-shots/SHOT_005_The_Texture.png" alt="" loading="lazy" />
-            </figure>
-            <div class="chapter-veil chapter-veil-soft" aria-hidden="true"></div>
-            <div class="chapter-copy chapter-copy-left chapter-copy-light">
-              <p class="chapter-kicker">THE DIFFERENCE</p>
-              <h2 data-commerce-step="0.1">Textura ligera.</h2>
-              <p data-commerce-step="0.38">Se integra sin sentirse pesada.</p>
-              <p data-commerce-step="0.64">Proteccion que deja la piel como piel.</p>
-            </div>
-            <!-- TODO V4: sustituir por secuencia real de brazo aplicando bloqueador. No simular textura con CSS. -->
           </div>
         </article>
 
         <article class="chapter chapter-science" data-commerce-chapter data-chapter="THE_SCIENCE">
           <div class="chapter-stage chapter-stage-paper science-stage">
-            <div class="science-lines" aria-hidden="true">
-              <span></span><span></span><span></span>
-            </div>
-            <div class="science-object" aria-hidden="true">
-              <img src="assets/ai-production/03 Product/product_white.png" alt="" loading="lazy" />
-            </div>
+            <figure class="science-hero" aria-hidden="true">
+              <picture>
+                <source type="image/avif" srcset="assets/web/mobile/LABORATORY_HERO.avif 828w, assets/web/desktop/LABORATORY_HERO.avif 1672w" sizes="100vw" />
+                <source type="image/webp" srcset="assets/web/mobile/LABORATORY_HERO.webp 828w, assets/web/desktop/LABORATORY_HERO.webp 1672w" sizes="100vw" />
+                <img src="assets/web/desktop/LABORATORY_HERO.webp" alt="" loading="lazy" />
+              </picture>
+            </figure>
+            <div class="science-lines" aria-hidden="true"><span></span><span></span><span></span></div>
             <div class="chapter-copy chapter-copy-left">
-              <p class="chapter-kicker">THE SCIENCE</p>
+              <p class="chapter-kicker">Cosmetología médica mexicana detrás de cada fórmula.</p>
               <h2>Desarrollado por UNIDERM.</h2>
-              <p data-commerce-step="0.28">Mas de 30 anos en cosmetologia medica.</p>
-              <p data-commerce-step="0.52">Proceso, calidad y experiencia mexicana detras de cada formula.</p>
+              <p data-commerce-step="0.28">Más de 30 años formulando protección para piel real.</p>
             </div>
             <div class="science-mark" aria-hidden="true">UNIDERM</div>
           </div>
@@ -306,167 +351,211 @@
 
         <article class="chapter chapter-mexico" data-commerce-chapter data-chapter="MADE_FOR_MEXICO">
           <div class="chapter-stage">
-            <figure class="chapter-media chapter-media-full mexico-water" aria-hidden="true">
-              <img src="assets/ai-production/02-shots/SHOT_002_Hero_Wide.png" alt="" loading="lazy" />
+            <figure class="mexico-scene mexico-scene-city" aria-hidden="true">
+              <picture>
+                <source type="image/avif" srcset="assets/web/mobile/CITY_001_FINAL.avif 828w, assets/web/desktop/CITY_001_FINAL.avif 1672w" sizes="(max-width: 759px) 43vw, 38vw" />
+                <source type="image/webp" srcset="assets/web/mobile/CITY_001_FINAL.webp 828w, assets/web/desktop/CITY_001_FINAL.webp 1672w" sizes="(max-width: 759px) 43vw, 38vw" />
+                <img src="assets/web/desktop/CITY_001_FINAL.webp" alt="" loading="lazy" />
+              </picture>
+              <figcaption>También aquí.</figcaption>
             </figure>
-            <figure class="chapter-media chapter-media-full mexico-depth" aria-hidden="true">
-              <img src="assets/ai-production/02-shots/SHOT_007A_UNDERWATER.png" alt="" loading="lazy" />
+            <figure class="mexico-scene mexico-scene-car" aria-hidden="true">
+              <picture>
+                <source type="image/avif" srcset="assets/web/mobile/MID_DAY_CAR.avif 828w, assets/web/desktop/MID_DAY_CAR.avif 1536w" sizes="(max-width: 759px) 43vw, 38vw" />
+                <source type="image/webp" srcset="assets/web/mobile/MID_DAY_CAR.webp 828w, assets/web/desktop/MID_DAY_CAR.webp 1536w" sizes="(max-width: 759px) 43vw, 38vw" />
+                <img src="assets/web/desktop/MID_DAY_CAR.webp" alt="" loading="lazy" />
+              </picture>
+              <figcaption>También durante el trayecto.</figcaption>
+            </figure>
+            <figure class="mexico-scene mexico-scene-beach" aria-hidden="true">
+              <picture>
+                <source type="image/avif" srcset="assets/web/mobile/BEACH2.avif 828w, assets/web/desktop/BEACH2.avif 1672w" sizes="100vw" />
+                <source type="image/webp" srcset="assets/web/mobile/BEACH2.webp 828w, assets/web/desktop/BEACH2.webp 1672w" sizes="100vw" />
+                <img src="assets/web/desktop/BEACH2.webp" alt="" loading="lazy" />
+              </picture>
+              <figcaption>También en vacaciones.</figcaption>
+            </figure>
+            <figure class="mexico-scene mexico-scene-sup" aria-hidden="true">
+              <picture>
+                <source type="image/avif" srcset="assets/web/mobile/SUP.avif 828w, assets/web/desktop/SUP.avif 1672w" sizes="100vw" />
+                <source type="image/webp" srcset="assets/web/mobile/SUP.webp 828w, assets/web/desktop/SUP.webp 1672w" sizes="100vw" />
+                <img src="assets/web/desktop/SUP.webp" alt="" loading="lazy" />
+              </picture>
+              <figcaption>También cuando exploras.</figcaption>
+            </figure>
+            <figure class="mexico-scene mexico-scene-yacht" aria-hidden="true">
+              <picture>
+                <source type="image/avif" srcset="assets/web/mobile/YACHT.avif 828w, assets/web/desktop/YACHT.avif 1536w" sizes="100vw" />
+                <source type="image/webp" srcset="assets/web/mobile/YACHT.webp 828w, assets/web/desktop/YACHT.webp 1536w" sizes="100vw" />
+                <img src="assets/web/desktop/YACHT.webp" alt="" loading="lazy" />
+              </picture>
+              <figcaption>Incluso cuando el cielo está nublado.</figcaption>
             </figure>
             <div class="chapter-veil chapter-veil-blue" aria-hidden="true"></div>
             <div class="chapter-copy chapter-copy-left chapter-copy-light">
-              <p class="chapter-kicker">MADE FOR MEXICO</p>
-              <h2>Pensado para el sol mexicano.</h2>
-              <p data-commerce-step="0.3">Para Costa Mujeres, Cancun, Tulum, Holbox y los cenotes que queremos seguir viendo claros.</p>
-              <p data-commerce-step="0.58">Proteccion para dias reales: calor, agua, familia y reaplicacion.</p>
-            </div>
-            <div class="place-line" aria-hidden="true">
-              <span>Costa Mujeres</span><span>Cancun</span><span>Tulum</span><span>Holbox</span><span>Cenotes</span>
+              <p class="chapter-kicker">Del Caribe a tu rutina diaria</p>
+              <h2>Del Caribe a la ciudad.</h2>
             </div>
           </div>
         </article>
 
-        <article class="chapter chapter-community" data-commerce-chapter data-chapter="COMMUNITY">
-          <div class="chapter-stage chapter-stage-paper">
-            <div class="memory-map" aria-hidden="true">
-              <span style="--x: 63%; --y: 26%" data-commerce-step="0.12">Cancun</span>
-              <span style="--x: 59%; --y: 20%" data-commerce-step="0.2">Holbox</span>
-              <span style="--x: 19%; --y: 39%" data-commerce-step="0.28">Los Cabos</span>
-              <span style="--x: 34%; --y: 57%" data-commerce-step="0.36">Sayulita</span>
-              <span style="--x: 39%; --y: 63%" data-commerce-step="0.44">Puerto Vallarta</span>
-              <span style="--x: 54%; --y: 76%" data-commerce-step="0.52">Huatulco</span>
-              <span style="--x: 67%; --y: 37%" data-commerce-step="0.6">Tulum</span>
-              <span style="--x: 64%; --y: 30%" data-commerce-step="0.68">Costa Mujeres</span>
-            </div>
-            <figure class="memory-image" aria-hidden="true">
-              <img src="assets/ai-production/02-shots/SHOT_003_The_Walk.png" alt="" loading="lazy" />
+        <article class="chapter chapter-ocean" data-commerce-chapter data-chapter="OCEAN_CENOTE">
+          <div class="chapter-stage ocean-stage">
+            <figure class="ocean-panel ocean-coral" aria-hidden="true">
+              <picture>
+                <source type="image/avif" srcset="assets/web/mobile/CORAL.avif 828w, assets/web/desktop/CORAL.avif 1672w" sizes="100vw" />
+                <source type="image/webp" srcset="assets/web/mobile/CORAL.webp 828w, assets/web/desktop/CORAL.webp 1672w" sizes="100vw" />
+                <img src="assets/web/desktop/CORAL.webp" alt="" loading="lazy" />
+              </picture>
             </figure>
-            <div class="chapter-copy chapter-copy-left">
-              <p class="chapter-kicker">COMMUNITY</p>
-              <h2>Luzela por Mexico.</h2>
-              <p>Un album vivo de dias bajo el sol.</p>
-              <p class="subtle-note">Instagram como origen de inspiracion: @luzelamx</p>
-              <!-- TODO V4: conectar fotografias reales aprobadas de comunidad por ubicacion. -->
+            <figure class="ocean-panel ocean-cenote" aria-hidden="true">
+              <picture>
+                <source type="image/avif" srcset="assets/web/mobile/CENOTE.avif 828w, assets/web/desktop/CENOTE.avif 1672w" sizes="100vw" />
+                <source type="image/webp" srcset="assets/web/mobile/CENOTE.webp 828w, assets/web/desktop/CENOTE.webp 1672w" sizes="100vw" />
+                <img src="assets/web/desktop/CENOTE.webp" alt="" loading="lazy" />
+              </picture>
+            </figure>
+            <figure class="ocean-panel ocean-wave" aria-hidden="true">
+              <picture>
+                <source type="image/avif" srcset="assets/web/mobile/WAVE.avif 828w, assets/web/desktop/WAVE.avif 1672w" sizes="100vw" />
+                <source type="image/webp" srcset="assets/web/mobile/WAVE.webp 828w, assets/web/desktop/WAVE.webp 1672w" sizes="100vw" />
+                <img src="assets/web/desktop/WAVE.webp" alt="" loading="lazy" />
+              </picture>
+            </figure>
+            <div class="chapter-veil chapter-veil-blue" aria-hidden="true"></div>
+            <div class="chapter-copy chapter-copy-left chapter-copy-light">
+              <p class="chapter-kicker">Ocean &amp; Cenote Friendly</p>
+              <h2 data-commerce-step="0.18">Diseñado para cuidar tu piel.</h2>
+              <p data-commerce-step="0.48">Pensado para respetar los lugares donde la disfrutas.</p>
             </div>
           </div>
         </article>
 
         <article class="chapter chapter-stories" data-commerce-chapter data-chapter="REAL_STORIES">
-          <div class="chapter-stage stories-stage">
-            <figure class="story-panel story-panel-a" aria-hidden="true">
-              <img src="assets/ai-production/02-shots/SHOT_002_Hero_Wide.png" alt="" loading="lazy" />
-            </figure>
-            <figure class="story-panel story-panel-b" aria-hidden="true">
-              <img src="assets/ai-production/02-shots/SHOT_003B_The_Sun.png" alt="" loading="lazy" />
-            </figure>
-            <figure class="story-panel story-panel-c" aria-hidden="true">
-              <img src="assets/ai-production/02-shots/SHOT_006_FIRST_TOUCH.png" alt="" loading="lazy" />
-            </figure>
-            <div class="chapter-veil chapter-veil-dark" aria-hidden="true"></div>
+          <div class="chapter-stage stories-stage stories-stage-editorial">
             <div class="story-copy">
-              <p class="chapter-kicker">REAL STORIES</p>
-              <h2 data-commerce-step="0.12">"Desde que usamos Luzela, nuestros dias de playa son mucho mas sencillos."</h2>
-              <p data-commerce-step="0.44">Placeholder para testimonio real aprobado.</p>
-              <p data-commerce-step="0.72">Sin estrellas. Sin reviews falsas. Solo historias verificadas cuando el cliente las entregue.</p>
-            </div>
-          </div>
-        </article>
-
-        <article class="chapter chapter-product" data-commerce-chapter data-chapter="THE_PRODUCT">
-          <div class="chapter-stage chapter-stage-paper product-stage">
-            <div class="product-hero" aria-hidden="true">
-              <img src="assets/ai-production/03 Product/product_white.png" alt="" loading="lazy" />
-            </div>
-            <div class="product-language" aria-label="Beneficios del producto">
-              <span data-commerce-step="0.12">SPF 50</span>
-              <span data-commerce-step="0.24">Mineral</span>
-              <span data-commerce-step="0.36">Vegano</span>
-              <span data-commerce-step="0.48">Libre de grasa</span>
-              <span data-commerce-step="0.6">Ocean Friendly</span>
-              <span data-commerce-step="0.72">Hecho en Mexico</span>
-            </div>
-            <div class="chapter-copy chapter-copy-left">
-              <p class="chapter-kicker">THE PRODUCT</p>
-              <h2>Proteccion solar mineral para dias de sol, agua y familia.</h2>
+              <p class="chapter-kicker">Historias reales</p>
+              <h2>No lo decimos nosotros.</h2>
+              <p class="story-subcopy">Estas son algunas de las experiencias compartidas por quienes ya viven con Luzela.</p>
+              <div class="story-quotes" aria-label="Testimonios reales visibles de Luzela">
+                <figure class="story-card">
+                  <picture>
+                    <source type="image/webp" srcset="assets/web/avatars/AVATAR1-Marcel.webp" />
+                    <img src="assets/web/avatars/AVATAR1-Marcel.webp" alt="Marcel" loading="lazy" />
+                  </picture>
+                  <div class="story-stars" aria-label="Cinco estrellas">
+                    <span></span><span></span><span></span><span></span><span></span>
+                  </div>
+                  <blockquote>“Excelente producto 🙌”</blockquote>
+                  <figcaption>Marcel</figcaption>
+                </figure>
+                <figure class="story-card">
+                  <picture>
+                    <source type="image/webp" srcset="assets/web/avatars/AVATAR2-AZU.webp" />
+                    <img src="assets/web/avatars/AVATAR2-AZU.webp" alt="Azu" loading="lazy" />
+                  </picture>
+                  <div class="story-stars" aria-label="Cinco estrellas">
+                    <span></span><span></span><span></span><span></span><span></span>
+                  </div>
+                  <blockquote>“No me sacó granitos y lo sentí súper fresco.”</blockquote>
+                  <figcaption>Azu</figcaption>
+                </figure>
+                <figure class="story-card">
+                  <picture>
+                    <source type="image/webp" srcset="assets/web/avatars/AVATAR3-_Ana_K.webp" />
+                    <img src="assets/web/avatars/AVATAR3-_Ana_K.webp" alt="Ana K." loading="lazy" />
+                  </picture>
+                  <div class="story-stars" aria-label="Cinco estrellas">
+                    <span></span><span></span><span></span><span></span><span></span>
+                  </div>
+                  <blockquote>“Me encanta porque no te deja grasosa la piel, y mi esposo se deja poner.”</blockquote>
+                  <figcaption>Ana K.</figcaption>
+                </figure>
+                <figure class="story-card">
+                  <picture>
+                    <source type="image/webp" srcset="assets/web/avatars/AVATAR4-Ale_G.webp" />
+                    <img src="assets/web/avatars/AVATAR4-Ale_G.webp" alt="Ale G." loading="lazy" />
+                  </picture>
+                  <div class="story-stars" aria-label="Cinco estrellas">
+                    <span></span><span></span><span></span><span></span><span></span>
+                  </div>
+                  <blockquote>“El mejor bloqueador, cero grasoso y me deja la piel radiante. Lo uso diario lit.”</blockquote>
+                  <figcaption>Ale G.</figcaption>
+                </figure>
+              </div>
             </div>
           </div>
         </article>
 
         <article class="chapter chapter-buy" id="buy" data-commerce-chapter data-chapter="BUY">
           <div class="chapter-stage chapter-stage-paper buy-stage">
-            <div class="buy-product" aria-hidden="true">
-              <img src="assets/ai-production/03 Product/product_white.png" alt="" loading="lazy" />
+            <div class="buy-scene" aria-hidden="true">
+              <picture>
+                <source type="image/webp" srcset="assets/web/product/BOTTLE.webp" />
+                <img class="buy-bottle buy-bottle-back" src="assets/web/product/BOTTLE.png" alt="" loading="lazy" />
+              </picture>
+              <picture>
+                <source type="image/webp" srcset="assets/web/product/BOTTLE.webp" />
+                <img class="buy-bottle buy-bottle-front" src="assets/web/product/BOTTLE.png" alt="" loading="lazy" />
+              </picture>
             </div>
-            <div class="buy-copy">
-              <p class="chapter-kicker">BUY</p>
-              <h2>Luzela Mineral Sunscreen SPF 50+</h2>
-              <p class="price-line">Precio oficial en tienda</p>
-              <p class="shipping-line">Envio desde tienda oficial Luzela.</p>
-              <a
-                class="buy-button"
-                href="https://luzelaskincare.godaddysites.com/tienda"
-                data-event="click_buy"
-                >Comprar Luzela</a
-              >
+            <div class="buy-message">
+              <div class="buy-copy">
+                <p class="chapter-kicker">COMPRA DIRECTA</p>
+                <h2>Dos Luzelas,<br />más días para recordar.</h2>
+                <p>Protección solar mineral SPF 50+ para compartir los días que más disfrutas.</p>
+                <div class="buy-benefits" aria-label="Beneficios principales">
+                  <span>Envío gratis a todo México.</span>
+                  <span>Precio especial comprando dos unidades.</span>
+                  <span>Compra segura en tienda oficial.</span>
+                </div>
+                <a
+                  class="buy-button"
+                  href="https://9fb53fd0-d2d7-42a1-aaca-6ac0d754c50f.mysimplestore.com/checkout"
+                  data-event="click_buy"
+                  >Comprar ahora</a
+                >
+                <a
+                  class="buy-link-secondary"
+                  href="https://luzelaskincare.godaddysites.com/tienda"
+                  data-event="click_buy"
+                  >Ver tienda completa</a
+                >
+              </div>
             </div>
             <div class="faq-panel" aria-label="Preguntas frecuentes">
               <div>
-                <h3>¿Es para ninos?</h3>
-                <p>Uso familiar. Confirmar indicaciones finales con el texto oficial del cliente.</p>
+                <h3>¿Es para niños?</h3>
+                <p>Sí. Luzela es un protector solar 100% mineral y no contiene filtros químicos.</p>
+                <p>Como con cualquier producto para la piel, si existe antecedente de alergias o alguna condición dermatológica específica, se recomienda consultar previamente con su pediatra.</p>
               </div>
               <div>
-                <h3>¿Deja sensacion grasosa?</h3>
-                <p>La formula esta pensada para sentirse ligera y libre de grasa.</p>
+                <h3>¿Deja sensación grasosa?</h3>
+                <p>La fórmula está pensada para sentirse ligera y libre de grasa.</p>
               </div>
               <div>
                 <h3>¿Es amigable con cenotes?</h3>
-                <p>Ocean &amp; Cenote Friendly segun claim aprobado por la marca.</p>
+                <p>Ocean &amp; Cenote Friendly según claim aprobado por la marca.</p>
               </div>
               <div>
-                <h3>¿Donde puedo comprar?</h3>
+                <h3>¿Dónde puedo comprar?</h3>
                 <p>La compra ocurre en la tienda oficial Luzela.</p>
               </div>
               <div>
-                <h3>¿Donde se fabrica?</h3>
-                <p>Hecho en Mexico y respaldado por UNIDERM.</p>
+                <h3>¿Dónde se fabrica?</h3>
+                <p>Hecho en México y respaldado por UNIDERM.</p>
               </div>
             </div>
           </div>
         </article>
 
-        <article class="chapter chapter-end" data-commerce-chapter data-chapter="FINAL_CTA">
-          <div class="chapter-stage">
-            <figure class="chapter-media chapter-media-full" aria-hidden="true">
-              <img src="assets/ai-production/02-shots/SHOT_003B_The_Sun.png" alt="" loading="lazy" />
-            </figure>
-            <div class="chapter-veil chapter-veil-sunset" aria-hidden="true"></div>
-            <div class="end-copy">
-              <img src="assets/ai-production/00 Brand DNA/logo-luzela-transparent.png" alt="Luzela" />
-              <p data-commerce-step="0.16">El sol seguira ahi manana.</p>
-              <p data-commerce-step="0.34">Protegelo.</p>
-              <p data-commerce-step="0.52">Protegelos.</p>
-              <p data-commerce-step="0.7">Protegete.</p>
-              <a
-                class="buy-button buy-button-light"
-                href="https://luzelaskincare.godaddysites.com/tienda"
-                data-event="click_buy"
-                >Comprar Luzela</a
-              >
-              <a
-                class="instagram-link"
-                href="https://www.instagram.com/luzelamx"
-                data-event="click_instagram"
-                >Seguir @luzelamx</a
-              >
-            </div>
-          </div>
-        </article>
       </section>
     </main>
 
     <footer class="site-footer">
-      <img src="assets/ai-production/00 Brand DNA/logo-luzela-transparent.png" alt="Luzela" />
+      <span class="footer-logo wordmark" aria-label="Luzela México"><span>LUZELA</span><small>méxico</small></span>
       <a href="https://www.instagram.com/luzelamx" data-event="click_instagram">@luzelamx</a>
-      <a href="https://luzelaskincare.godaddysites.com/pol%C3%ADtica-de-privacidad">Politicas</a>
+      <a href="https://luzelaskincare.godaddysites.com/pol%C3%ADtica-de-privacidad">Políticas</a>
       <p>Copyright © 2026 Luzela MX.</p>
     </footer>
 
