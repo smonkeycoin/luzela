@@ -1,36 +1,46 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Luzela Commerce OS
 
-## Getting Started
+Independent commerce engine for Luzela. This project does not modify `/Users/smonkeycoin/Desktop/luzelalanding`.
 
-First, run the development server:
+## Sprint 0
+
+Built:
+
+- Next.js 16 App Router shell.
+- Mobile-first checkout shell.
+- Admin dashboard shell at `/admin`.
+- Stripe webhook route with signed-event boundary.
+- Supabase client boundaries for public/server and service-role usage.
+- Supabase schema draft in `supabase/schema.sql`.
+- Architecture docs in `docs/`.
+- Sprint 0 delivery summary in `docs/SPRINT_0_DELIVERY.md`.
+- `.env.example` without real credentials.
+
+Not built yet:
+
+- Live Stripe checkout.
+- Live Supabase connection.
+- Product CRUD mutations.
+- Order fulfillment actions.
+- Resend sending.
+- Vercel deployment.
+
+## Run
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Verify
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run lint
+npm run build
+```
 
-## Learn More
+## Key Rule
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+The browser redirect never marks an order as paid. Only a verified Stripe webhook can move an order into `paid`.

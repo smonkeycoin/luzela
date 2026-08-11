@@ -1,0 +1,38 @@
+type PaymentLogosProps = {
+  includeStripe?: boolean;
+  compact?: boolean;
+};
+
+export function PaymentLogos({ includeStripe = true, compact = false }: PaymentLogosProps) {
+  const sizeClass = compact ? "h-7 min-w-12 text-[10px]" : "h-9 min-w-16 text-xs";
+
+  return (
+    <div className="flex flex-wrap items-center gap-2" aria-label="Metodos de pago">
+      <span
+        className={`${sizeClass} inline-flex items-center justify-center rounded-[6px] border border-[var(--line)] bg-white px-2 font-bold text-[#173a7a]`}
+      >
+        VISA
+      </span>
+      <span
+        className={`${sizeClass} relative inline-flex items-center justify-center rounded-[6px] border border-[var(--line)] bg-white px-2`}
+        aria-label="Mastercard"
+      >
+        <span className="absolute left-1/2 h-4 w-4 -translate-x-[65%] rounded-full bg-[#eb001b]" />
+        <span className="absolute left-1/2 h-4 w-4 -translate-x-[15%] rounded-full bg-[#f79e1b] mix-blend-multiply" />
+        <span className="relative sr-only">Mastercard</span>
+      </span>
+      <span
+        className={`${sizeClass} inline-flex items-center justify-center rounded-[6px] border border-[#2e77bc] bg-[#2e77bc] px-2 font-bold text-white`}
+      >
+        AMEX
+      </span>
+      {includeStripe ? (
+        <span
+          className={`${sizeClass} inline-flex items-center justify-center rounded-[6px] border border-[var(--line)] bg-white px-2 font-bold text-[#635bff]`}
+        >
+          stripe
+        </span>
+      ) : null}
+    </div>
+  );
+}

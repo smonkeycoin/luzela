@@ -1,26 +1,61 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #fbfaf7;
+  --foreground: #171310;
+  --ink: #171310;
+  --muted: #716a63;
+  --line: #e6ded3;
+  --paper: #fffdf8;
+  --coral: #e25f46;
+  --teal: #0f766e;
+  --sun: #f2b84b;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: var(--font-montserrat);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-montserrat), Arial, Helvetica, sans-serif;
+}
+
+button,
+a,
+input,
+textarea,
+select {
+  letter-spacing: 0;
+}
+
+::selection {
+  background: #f2b84b55;
+}
+
+.surface {
+  background: color-mix(in srgb, var(--paper) 92%, white);
+  border: 1px solid var(--line);
+}
+
+.focus-ring {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.focus-ring:focus-visible {
+  outline-color: var(--teal);
+}
+
+.traveling-luzela-ready .hero-static-bottle {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-static-bottle {
+    opacity: 1;
+  }
 }
