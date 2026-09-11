@@ -1,6 +1,10 @@
 import { InfoPage } from "@/components/info-page";
+import { getShippingPolicy } from "@/lib/settings";
 
-const faqs = [
+export const dynamic = "force-dynamic";
+
+function getFaqs(shippingPolicy: Awaited<ReturnType<typeof getShippingPolicy>>) {
+  return [
   {
     question: "¿Es para niños?",
     answer:
@@ -27,13 +31,11 @@ const faqs = [
   },
   {
     question: "¿Cuánto tarda el envío?",
-    answer:
-      "Realizamos nuestros envíos con DHL. Una vez confirmado tu pedido, el tiempo estimado de entrega es de 2 a 5 días hábiles, dependiendo del destino.",
+    answer: `Realizamos nuestros envíos con ${shippingPolicy.carrierDisplayName}. Una vez confirmado tu pedido, el tiempo estimado de entrega es de ${shippingPolicy.minDays} a ${shippingPolicy.maxDays} ${shippingPolicy.businessDays ? "días hábiles" : "días"}, dependiendo del destino.`,
   },
   {
     question: "¿Cómo rastreo mi pedido?",
-    answer:
-      "Cuando tu pedido esté listo para salir, recibirás automáticamente por correo electrónico tu número de guía DHL y la información para rastrear tu envío.",
+    answer: `Cuando tu pedido esté listo para salir, recibirás automáticamente por correo electrónico tu número de guía ${shippingPolicy.carrierDisplayName} y la información para rastrear tu envío.`,
   },
   {
     question: "¿Qué métodos de pago aceptan?",
@@ -44,9 +46,12 @@ const faqs = [
     question: "¿Necesito crear una cuenta para comprar?",
     answer: "No. Puedes completar tu compra directamente sin crear una cuenta.",
   },
-];
+  ];
+}
 
-export default function FAQPage() {
+export default async function FAQPage() {
+  const faqs = getFaqs(await getShippingPolicy());
+
   return (
     <InfoPage eyebrow="Ayuda" title="Preguntas frecuentes">
       <div className="grid gap-3">

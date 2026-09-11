@@ -13,7 +13,10 @@ export async function POST(request: Request) {
   const xSignature = headerList.get("x-signature") || "";
   const xRequestId = headerList.get("x-request-id") || "";
   const url = new URL(request.url);
-  const dataId = url.searchParams.get("data.id") || "";
+  const payload = await request.json().catch(() => ({}));
+  const payloadDataId =
+    typeof payload?.data?.id === "string" ? payload.data.id : "";
+  const dataId = url.searchParams.get("data.id") || payloadDataId;
 
   if (!secret || !xSignature || !xRequestId || !dataId) {
     return NextResponse.json(
@@ -33,7 +36,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "invalid_signature" }, { status: 401 });
   }
 
-  const payload = await request.json();
   await processMercadoPagoWebhook({ dataId, payload });
 
   return NextResponse.json({ received: true });

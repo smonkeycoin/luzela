@@ -17,6 +17,7 @@ const checkoutRequestSchema = z.object({
   quantity: z.coerce.number().int().positive().max(10).default(1),
   coupon_code: z.string().trim().max(64).optional(),
   idempotency_key: z.uuid(),
+  attribution: z.string().trim().max(8000).optional(),
 });
 
 export async function POST(request: Request) {
@@ -34,8 +35,21 @@ export async function POST(request: Request) {
   const result = await createCheckoutSession(parsed.data);
 
   if (!result.ok) {
+    if (result.status >= 500) {
+      console.error("Checkout failed", {
+        error: result.error,
+        status: result.status,
+      });
+
+      return NextResponse.json(
+        { ok: false, error: "payment_temporarily_unavailable" },
+        { status: result.status },
+      );
+    }
+
     return NextResponse.json(result, { status: result.status });
   }
 
+  if(request.headers.get("accept")?.includes("application/json"))return NextResponse.json(result);
   return NextResponse.redirect(result.url, { status: 303 });
 }

@@ -19,7 +19,7 @@ create type public.inventory_movement_type as enum ('purchase', 'sale', 'adjustm
 create type public.checkout_status as enum ('started', 'contact_captured', 'payment_started', 'converted', 'abandoned', 'expired');
 create type public.shipment_status as enum ('pending', 'ready', 'shipped', 'delivered', 'returned', 'lost');
 create type public.coupon_status as enum ('draft', 'active', 'inactive', 'expired');
-create type public.message_status as enum ('queued', 'sent', 'delivered', 'failed', 'skipped');
+create type public.message_status as enum ('queued', 'pending', 'sent', 'delivered', 'failed', 'skipped');
 
 create or replace function public.set_updated_at()
 returns trigger
@@ -95,6 +95,7 @@ create table public.products (
   name text not null,
   description text,
   status public.product_status not null default 'draft',
+  is_visible boolean not null default true,
   is_bundle boolean not null default false,
   free_shipping boolean not null default false,
   sort_order integer not null default 0,
@@ -112,6 +113,8 @@ create table public.product_variants (
   status public.product_status not null default 'draft',
   price_cents integer not null check (price_cents >= 0),
   compare_at_price_cents integer check (compare_at_price_cents is null or compare_at_price_cents >= price_cents),
+  offer_price_cents integer check (offer_price_cents is null or offer_price_cents > 0),
+  offer_active boolean not null default false,
   currency text not null default 'mxn',
   weight_grams integer check (weight_grams is null or weight_grams >= 0),
   bundle_components jsonb not null default '[]'::jsonb,
@@ -121,6 +124,17 @@ create table public.product_variants (
   updated_at timestamptz not null default now(),
   deleted_at timestamptz
 );
+
+alter table public.product_variants
+  add constraint product_variants_offer_price_lower_than_original_check
+  check (
+    offer_active = false
+    or (
+      offer_price_cents is not null
+      and offer_price_cents > 0
+      and offer_price_cents < price_cents
+    )
+  );
 
 create table public.product_images (
   id uuid primary key default gen_random_uuid(),
@@ -194,6 +208,34 @@ create table public.order_items (
   subtotal_cents integer not null check (subtotal_cents >= 0),
   metadata jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now()
+);
+
+create table public.order_attribution (
+  order_id uuid primary key references public.orders(id) on delete cascade,
+  first_touch_source text not null default 'direct',
+  first_touch_medium text not null default 'none',
+  first_touch_campaign text not null default '',
+  first_touch_content text not null default '',
+  first_touch_term text not null default '',
+  first_touch_referrer text not null default '',
+  first_touch_landing_path text not null default '/',
+  first_touch_landing_url text not null default '',
+  first_seen_at timestamptz not null default now(),
+  last_touch_source text not null default 'direct',
+  last_touch_medium text not null default 'none',
+  last_touch_campaign text not null default '',
+  last_touch_content text not null default '',
+  last_touch_term text not null default '',
+  last_touch_referrer text not null default '',
+  last_touch_landing_path text not null default '/',
+  last_touch_landing_url text not null default '',
+  last_seen_at timestamptz not null default now(),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint order_attribution_first_touch_source_length check (char_length(first_touch_source) <= 160),
+  constraint order_attribution_last_touch_source_length check (char_length(last_touch_source) <= 160),
+  constraint order_attribution_first_touch_url_length check (char_length(first_touch_landing_url) <= 512),
+  constraint order_attribution_last_touch_url_length check (char_length(last_touch_landing_url) <= 512)
 );
 
 create table public.payments (
@@ -331,12 +373,19 @@ create table public.email_events (
   customer_id uuid references public.customers(id) on delete set null,
   order_id uuid references public.orders(id) on delete set null,
   template_key text not null,
-  status public.message_status not null default 'queued',
+  event_type text not null,
+  recipient citext,
+  status public.message_status not null default 'pending',
+  provider text,
   provider_message_id text unique,
   idempotency_key text,
+  attempt_count integer not null default 0 check (attempt_count >= 0),
+  last_attempt_at timestamptz,
+  error_code text,
   error_message text,
   payload jsonb not null default '{}'::jsonb,
   created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
   sent_at timestamptz
 );
 
@@ -371,7 +420,9 @@ create index customers_email_idx on public.customers(email) where deleted_at is 
 create index customers_phone_idx on public.customers(phone) where phone is not null;
 create index customer_addresses_customer_id_idx on public.customer_addresses(customer_id) where deleted_at is null;
 create index products_status_sort_idx on public.products(status, sort_order) where deleted_at is null;
+create index products_visible_status_sort_idx on public.products(is_visible, status, sort_order) where deleted_at is null;
 create index product_variants_product_id_idx on public.product_variants(product_id) where deleted_at is null;
+create index product_variants_offer_active_idx on public.product_variants(offer_active) where deleted_at is null;
 create index product_images_product_sort_idx on public.product_images(product_id, sort_order);
 create unique index product_images_product_url_unique_idx on public.product_images(product_id, url);
 create index inventory_variant_id_idx on public.inventory(variant_id);
@@ -382,6 +433,9 @@ create index orders_customer_created_idx on public.orders(customer_id, created_a
 create index orders_status_idx on public.orders(status);
 create index orders_paid_at_idx on public.orders(paid_at) where paid_at is not null;
 create index order_items_order_id_idx on public.order_items(order_id);
+create index order_attribution_last_touch_source_idx on public.order_attribution(last_touch_source, last_touch_medium);
+create index order_attribution_last_touch_campaign_idx on public.order_attribution(last_touch_campaign) where last_touch_campaign <> '';
+create index order_attribution_first_touch_source_idx on public.order_attribution(first_touch_source, first_touch_medium);
 create index payments_order_id_idx on public.payments(order_id);
 create index payment_events_order_id_idx on public.payment_events(order_id) where order_id is not null;
 create unique index payment_events_provider_event_uidx
@@ -396,6 +450,8 @@ create index abandoned_checkouts_status_created_idx on public.abandoned_checkout
 create index customer_notes_customer_created_idx on public.customer_notes(customer_id, created_at desc);
 create index email_events_status_created_idx on public.email_events(status, created_at desc);
 create unique index email_events_idempotency_key_unique_idx on public.email_events(idempotency_key) where idempotency_key is not null;
+create index email_events_order_created_idx on public.email_events(order_id, created_at desc);
+create index email_events_last_attempt_idx on public.email_events(last_attempt_at desc) where last_attempt_at is not null;
 create index whatsapp_events_status_created_idx on public.whatsapp_events(status, created_at desc);
 create index audit_log_table_row_idx on public.audit_log(table_name, row_id);
 
@@ -405,6 +461,7 @@ create trigger customers_updated_at before update on public.customers for each r
 create trigger customer_addresses_updated_at before update on public.customer_addresses for each row execute function public.set_updated_at();
 create trigger products_updated_at before update on public.products for each row execute function public.set_updated_at();
 create trigger product_variants_updated_at before update on public.product_variants for each row execute function public.set_updated_at();
+create trigger order_attribution_updated_at before update on public.order_attribution for each row execute function public.set_updated_at();
 create trigger coupons_updated_at before update on public.coupons for each row execute function public.set_updated_at();
 create trigger orders_updated_at before update on public.orders for each row execute function public.set_updated_at();
 create trigger payments_updated_at before update on public.payments for each row execute function public.set_updated_at();
@@ -412,6 +469,7 @@ create trigger shipments_updated_at before update on public.shipments for each r
 create trigger checkout_sessions_updated_at before update on public.checkout_sessions for each row execute function public.set_updated_at();
 create trigger abandoned_checkouts_updated_at before update on public.abandoned_checkouts for each row execute function public.set_updated_at();
 create trigger inventory_updated_at before update on public.inventory for each row execute function public.set_updated_at();
+create trigger email_events_updated_at before update on public.email_events for each row execute function public.set_updated_at();
 
 create or replace function public.mark_order_shipped(
   p_order_id uuid,
@@ -643,6 +701,7 @@ alter table public.inventory enable row level security;
 alter table public.inventory_movements enable row level security;
 alter table public.orders enable row level security;
 alter table public.order_items enable row level security;
+alter table public.order_attribution enable row level security;
 alter table public.payments enable row level security;
 alter table public.payment_events enable row level security;
 alter table public.shipments enable row level security;
@@ -675,6 +734,7 @@ grant select, insert, update, delete on
   public.inventory_movements,
   public.orders,
   public.order_items,
+  public.order_attribution,
   public.payments,
   public.payment_events,
   public.shipments,
@@ -698,7 +758,7 @@ create policy "public can read active products"
 on public.products
 for select
 to anon, authenticated
-using (status = 'active' and deleted_at is null);
+using (status = 'active' and is_visible = true and deleted_at is null);
 
 create policy "public can read active variants"
 on public.product_variants
@@ -712,6 +772,7 @@ using (
     from public.products p
     where p.id = product_id
       and p.status = 'active'
+      and p.is_visible = true
       and p.deleted_at is null
   )
 );
@@ -726,6 +787,7 @@ using (
     from public.products p
     where p.id = product_id
       and p.status = 'active'
+      and p.is_visible = true
       and p.deleted_at is null
   )
 );
@@ -743,6 +805,7 @@ using (
       and v.status = 'active'
       and v.deleted_at is null
       and p.status = 'active'
+      and p.is_visible = true
       and p.deleted_at is null
   )
 );
@@ -769,6 +832,7 @@ begin
     'inventory_movements',
     'orders',
     'order_items',
+    'order_attribution',
     'payments',
     'payment_events',
     'shipments',

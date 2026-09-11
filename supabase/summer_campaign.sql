@@ -14,8 +14,8 @@ where sku in ('LUZ-SPF50-IND', 'LUZ-SPF50-DUO');
 insert into public.products (slug, name, description, status, is_bundle, free_shipping, sort_order, attributes)
 values
   ('summer-1x', 'SUMMER 1X', 'La esencial. Una Luzela para acompañar tus días de sol.', 'active', true, true, 10, '{"campaign":"summer","units_per_pack":1}'::jsonb),
-  ('summer-2x', 'SUMMER 2X', 'Una para ti. Una para compartir.', 'active', true, true, 20, '{"campaign":"summer","units_per_pack":2,"unit_price_display":"$325 c/u"}'::jsonb),
-  ('summer-3x', 'SUMMER 3X', 'Una para ti. Una para compartir. Una para que no falte.', 'active', true, true, 30, '{"campaign":"summer","units_per_pack":3,"unit_price_display":"$297 c/u","badge":"MEJOR VALOR","secondary_headline":"Más días para recordar."}'::jsonb)
+  ('summer-2x', 'SUMMER 2X', 'Una para ti. Una para compartir.', 'active', true, true, 20, '{"campaign":"summer","units_per_pack":2}'::jsonb),
+  ('summer-3x', 'SUMMER 3X', 'Una para ti. Una para compartir. Una para que no falte.', 'active', true, true, 30, '{"campaign":"summer","units_per_pack":3,"badge":"SUMMER DEAL"}'::jsonb)
 on conflict (slug) do update
 set name = excluded.name,
     description = excluded.description,
@@ -34,6 +34,8 @@ insert into public.product_variants (
   status,
   price_cents,
   compare_at_price_cents,
+  offer_price_cents,
+  offer_active,
   currency,
   bundle_components,
   metadata
@@ -45,6 +47,8 @@ select
   'active'::public.product_status,
   values_table.price_cents,
   null,
+  values_table.offer_price_cents,
+  values_table.offer_active,
   'mxn',
   jsonb_build_array(
     jsonb_build_object(
@@ -61,10 +65,10 @@ select
   )
 from (
   values
-    ('summer-1x', 'LUZ-SUMMER-1X', '1 Luzela', 39000, 1, 'summer_1x'),
-    ('summer-2x', 'LUZ-SUMMER-2X', '2 Luzelas', 65000, 2, 'summer_2x'),
-    ('summer-3x', 'LUZ-SUMMER-3X', '3 Luzelas', 89000, 3, 'summer_3x')
-) as values_table(product_slug, sku, name, price_cents, units_per_pack, analytics_item_id)
+    ('summer-1x', 'LUZ-SUMMER-1X', '1 Luzela', 45900, null::integer, false, 1, 'summer_1x'),
+    ('summer-2x', 'LUZ-SUMMER-2X', '2 Luzelas', 76900, null::integer, false, 2, 'summer_2x'),
+    ('summer-3x', 'LUZ-SUMMER-3X', '3 Luzelas', 81900, null::integer, false, 3, 'summer_3x')
+) as values_table(product_slug, sku, name, price_cents, offer_price_cents, offer_active, units_per_pack, analytics_item_id)
 join public.products p on p.slug = values_table.product_slug
 join public.product_variants base_variant on base_variant.sku = 'LUZ-SPF50-IND'
 on conflict (sku) do update
@@ -73,6 +77,8 @@ set product_id = excluded.product_id,
     status = 'active',
     price_cents = excluded.price_cents,
     compare_at_price_cents = excluded.compare_at_price_cents,
+    offer_price_cents = excluded.offer_price_cents,
+    offer_active = excluded.offer_active,
     currency = excluded.currency,
     bundle_components = excluded.bundle_components,
     metadata = excluded.metadata,

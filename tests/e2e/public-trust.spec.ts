@@ -1,5 +1,55 @@
 import { expect, test } from "@playwright/test";
 
+test("public metadata is branded for Luzela", async ({ page, request }) => {
+  await page.goto("/");
+
+  await expect(page).toHaveTitle("Luzela | Protección Solar Mineral SPF 50+");
+  await expect(page.locator('meta[name="description"]')).toHaveAttribute(
+    "content",
+    "Protección solar mineral SPF 50+ hecha en México. Ligera, 100% mineral y pensada para acompañarte de la ciudad al mar.",
+  );
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute(
+    "href",
+    "https://luzela.mx",
+  );
+  await expect(page.locator('meta[property="og:title"]')).toHaveAttribute(
+    "content",
+    "Luzela | Protección Solar Mineral SPF 50+",
+  );
+  await expect(page.locator('meta[property="og:description"]')).toHaveAttribute(
+    "content",
+    "Más Luzela. Más días bajo el sol. Protección solar mineral SPF 50+ hecha en México.",
+  );
+  await expect(page.locator('meta[property="og:url"]')).toHaveAttribute(
+    "content",
+    "https://luzela.mx",
+  );
+  await expect(page.locator('meta[property="og:image"]')).toHaveAttribute(
+    "content",
+    /\/opengraph-image/,
+  );
+  await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute(
+    "content",
+    "summary_large_image",
+  );
+  await expect(page.locator('link[rel="icon"]')).toHaveAttribute("href", "/icon");
+  await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveAttribute(
+    "href",
+    "/apple-icon",
+  );
+
+  const head = await page.locator("head").innerHTML();
+  expect(head).not.toMatch(/vercel|vercel\.app/i);
+
+  const ogImage = await request.get("/opengraph-image");
+  expect(ogImage.ok()).toBe(true);
+  expect(ogImage.headers()["content-type"]).toContain("image/png");
+
+  const icon = await request.get("/icon");
+  expect(icon.ok()).toBe(true);
+  expect(icon.headers()["content-type"]).toContain("image/png");
+});
+
 test("public footer and trust links are visible", async ({ page }) => {
   await page.goto("/");
 

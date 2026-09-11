@@ -1,3 +1,4 @@
+import { CollabFeature, CollabProof } from "@/components/collab-feature";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, Star } from "lucide-react";
@@ -5,8 +6,12 @@ import { ArrowRight, Star } from "lucide-react";
 import { PublicFooter } from "@/components/public-footer";
 import { PublicHeader } from "@/components/public-header";
 import { ShopSection } from "@/components/shop-section";
+import { MetaPixelEvent } from "@/components/meta-pixel";
 import { TravelingBottle } from "@/components/traveling-bottle";
 import { getActiveProducts } from "@/lib/catalog/get-active-products";
+import { getFeatureFlags } from "@/lib/settings";
+
+export const dynamic = "force-dynamic";
 
 const benefits = [
   "SPF 50+",
@@ -31,10 +36,14 @@ const reviews = [
 ];
 
 export default async function Home() {
-  const { products, error } = await getActiveProducts();
+  const [{ products, error }, featureFlags] = await Promise.all([
+    getActiveProducts(),
+    getFeatureFlags(),
+  ]);
 
   return (
     <main className="min-h-screen">
+      <MetaPixelEvent event="ViewContent" />
       <PublicHeader />
       <TravelingBottle />
 
@@ -105,8 +114,10 @@ export default async function Home() {
         </div>
       </section>
 
+      <CollabProof />
       <ShopSection products={products} error={error} />
 
+      {featureFlags.publicReviewsEnabled ? (
       <section data-travel-exit className="border-y border-[var(--line)] bg-white">
         <div className="mx-auto grid max-w-7xl gap-8 px-5 py-14 sm:px-8 lg:grid-cols-[0.8fr_1.2fr] lg:py-20">
           <div>
@@ -136,6 +147,9 @@ export default async function Home() {
           </div>
         </div>
       </section>
+      ) : (
+        <div data-travel-exit className="h-px" aria-hidden="true" />
+      )}
 
       <section className="mx-auto grid max-w-7xl gap-8 px-5 py-16 sm:px-8 lg:grid-cols-[1fr_1fr] lg:items-center lg:py-24">
         <div className="relative min-h-[420px] overflow-hidden">
@@ -164,6 +178,7 @@ export default async function Home() {
         </div>
       </section>
 
+      <CollabFeature />
       <PublicFooter />
     </main>
   );

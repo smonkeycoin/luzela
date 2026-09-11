@@ -1,0 +1,7 @@
+.codex-backups
+.env*
+playwright/.auth
+playwright-report
+test-results
+docs/qa
+*.pdf

@@ -4,6 +4,7 @@ export type MercadoPagoOrder = {
   id: string;
   status?: string;
   status_detail?: string;
+  country_code?: string;
   external_reference?: string;
   total_amount?: string;
   transactions?: {

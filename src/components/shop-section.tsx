@@ -1,4 +1,7 @@
+"use client";
+
 import Image from "next/image";
+import { useMemo, useState } from "react";
 import { Leaf, MapPin, ShieldCheck, Truck } from "lucide-react";
 
 import type { CatalogProduct } from "@/lib/catalog/types";
@@ -6,6 +9,7 @@ import { formatMoney } from "@/lib/money";
 
 import { AddToCartButton } from "./add-to-cart-button";
 import { ProductPackImage } from "./product-pack-image";
+import { ChavolinesPackFeature } from "./chavolines-pack-feature";
 
 function isDuo(product: CatalogProduct) {
   return /d[uú]o/i.test(`${product.name} ${product.variant.name}`);
@@ -48,7 +52,8 @@ const summerTrustFacts = [
 
 export function ShopSection({ products, error }: { products: CatalogProduct[]; error?: string }) {
   const summerMode = products.some(isSummer);
-  const sorted = [...products].sort((a, b) => {
+  const [category, setCategory] = useState("Todos");
+  const sorted = useMemo(() => [...products].sort((a, b) => {
     if (summerMode) {
       const desktopOrder = new Map([
         [1, 1],
@@ -61,8 +66,17 @@ export function ShopSection({ products, error }: { products: CatalogProduct[]; e
       );
     }
 
-    return Number(isDuo(b)) - Number(isDuo(a));
-  });
+    return a.sort_order - b.sort_order;
+  }), [products, summerMode]);
+  const categories = useMemo(
+    () =>
+      Array.from(
+        new Set(sorted.map((product) => product.category).filter((value): value is string => Boolean(value))),
+      ),
+    [sorted],
+  );
+  const visibleProducts =
+    category === "Todos" ? sorted : sorted.filter((product) => product.category === category);
 
   return (
     <section
@@ -76,7 +90,7 @@ export function ShopSection({ products, error }: { products: CatalogProduct[]; e
             Tienda
           </p>
           <h2 className="mt-3 text-3xl font-semibold text-[var(--ink)] sm:text-4xl">
-            {summerMode ? "ELIGE TU SUMMER" : "Elige tu Luzela."}
+            {summerMode ? "ELIGE TU SUMMER" : "Catálogo"}
           </h2>
           {summerMode ? (
             <p className="mt-3 max-w-xl text-sm leading-7 text-[var(--muted)]">
@@ -106,7 +120,25 @@ export function ShopSection({ products, error }: { products: CatalogProduct[]; e
                 : "contents"
             }
           >
-            {sorted.map((product) => {
+            {!summerMode && categories.length > 1 ? (
+              <div className="mb-2 flex flex-wrap gap-2 lg:col-span-3">
+                {["Todos", ...categories].map((item) => (
+                  <button
+                    key={item}
+                    type="button"
+                    onClick={() => setCategory(item)}
+                    className={`focus-ring rounded-[8px] border px-3 py-2 text-sm font-semibold ${
+                      category === item
+                        ? "border-[var(--teal)] bg-[var(--teal)] text-white"
+                        : "border-[var(--line)] bg-white text-[var(--ink)]"
+                    }`}
+                  >
+                    {item}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+            {visibleProducts.map((product) => {
               const available = product.variant.stock_on_hand > 0;
               const duo = isDuo(product);
               const summer = isSummer(product);
@@ -116,6 +148,7 @@ export function ShopSection({ products, error }: { products: CatalogProduct[]; e
               const orderClass = summer
                 ? getSummerOrderClasses(product.variant.units_per_pack)
                 : "";
+              const hasOffer = product.variant.offer_active && product.variant.offer_price_cents;
 
               return (
                 <article
@@ -129,6 +162,7 @@ export function ShopSection({ products, error }: { products: CatalogProduct[]; e
                   }`}
                 >
                   <div data-travel-duo-visual={featured ? "true" : undefined}>
+                    {product.slug === "summer-3x" ? <ChavolinesPackFeature /> : null}
                     {summer ? (
                       <ProductPackImage
                         alt={`${product.name} ${product.variant.units_per_pack}X`}
@@ -137,13 +171,19 @@ export function ShopSection({ products, error }: { products: CatalogProduct[]; e
                       />
                     ) : (
                       <div className="grid aspect-square w-full min-w-0 max-w-full place-items-center overflow-hidden bg-white">
-                        <Image
-                          src={product.image_url || "/luzela/bottle.webp"}
-                          alt={product.name}
-                          width={featured ? 240 : 180}
-                          height={featured ? 240 : 180}
-                          className="h-[82%] w-auto object-contain"
-                        />
+                        {product.image_url ? (
+                          <Image
+                            src={product.image_url}
+                            alt={product.name}
+                            width={featured ? 240 : 180}
+                            height={featured ? 240 : 180}
+                            className="h-[82%] w-auto object-contain"
+                          />
+                        ) : (
+                          <div className="grid size-full place-items-center p-6 text-center text-sm font-semibold uppercase tracking-[0.12em] text-[var(--muted)]">
+                            {product.name}
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
@@ -173,8 +213,22 @@ export function ShopSection({ products, error }: { products: CatalogProduct[]; e
                       {product.variant.secondary_headline || "\u00a0"}
                     </p>
                     <div>
-                      <p className="text-xl font-semibold text-[var(--ink)]">
-                        {formatMoney(product.variant.price_cents, product.variant.currency)}
+                      {hasOffer ? (
+                        <p className="text-sm font-semibold text-[var(--muted)] line-through decoration-[var(--muted)]/70 decoration-1">
+                          {formatMoney(product.variant.price_cents, product.variant.currency)}
+                        </p>
+                      ) : null}
+                      <p
+                        className={`font-semibold ${
+                          hasOffer || featured
+                            ? "text-2xl text-[var(--teal)]"
+                            : "text-xl text-[var(--ink)]"
+                        }`}
+                      >
+                        {formatMoney(
+                          product.variant.effective_price_cents,
+                          product.variant.currency,
+                        )}
                       </p>
                       <p className="mt-1 text-sm font-semibold text-[var(--muted)]">
                         {product.variant.unit_price_label || "\u00a0"}
@@ -185,7 +239,7 @@ export function ShopSection({ products, error }: { products: CatalogProduct[]; e
                         ? product.description
                         : duo
                           ? "Dos Luzelas, más días para recordar."
-                          : product.description || "SPF 50+ mineral para tus días de sol."}
+                          : product.description || ""}
                     </p>
                     <div>
                       {product.free_shipping ? (
@@ -201,7 +255,7 @@ export function ShopSection({ products, error }: { products: CatalogProduct[]; e
                           available ? "text-[var(--teal)]" : "text-[var(--coral)]"
                         }`}
                       >
-                        {available ? "Disponible" : "Sin stock disponible"}
+                        {product.variant.stock_label}
                       </p>
                       <AddToCartButton product={product} featured={featured} />
                     </div>

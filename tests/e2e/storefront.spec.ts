@@ -31,9 +31,11 @@ test("storefront loads and shows products", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "SUMMER 1X" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "SUMMER 2X" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "SUMMER 3X" })).toBeVisible();
-  await expect(page.getByText("$390.00")).toBeVisible();
-  await expect(page.getByText("$650.00")).toBeVisible();
-  await expect(page.getByText("$890.00")).toBeVisible();
+  await expect(page.getByText("$459.00", {exact:true})).toBeVisible();
+  await expect(page.getByText("$769.00", {exact:true})).toBeVisible();
+  await expect(page.getByText("$819.00", {exact:true})).toBeVisible();
+  await expect(page.getByText("$384.50 c/u")).toBeVisible();
+  await expect(page.getByText("$273.00 c/u")).toBeVisible();
   await expect(page.getByText("Ocean & Cenote Friendly").first()).toBeVisible();
   await expect(page.getByText("DEL CARIBE A TU RUTINA DIARIA")).toBeVisible();
   await expect(page.locator('[data-pack-bottle="card-1x"]')).toHaveCount(1);
@@ -64,7 +66,9 @@ test("summer pack hierarchy is editorial and has one CTA per card", async ({ pag
   const featuredCard = page.locator('[data-summer-pack="3x"]');
   const featuredCta = featuredCard.getByRole("link", { name: "Elegir 3X", exact: true });
 
-  await expect(featuredCard.getByText("MEJOR VALOR", { exact: true })).toBeVisible();
+  await expect(featuredCard.getByText("SUMMER DEAL", { exact: true })).toBeVisible();
+  await expect(featuredCard.locator(".line-through")).toHaveCount(0);
+  await expect(featuredCard.getByText("$819.00", {exact:true})).toBeVisible();
   await expect(featuredCta).toHaveClass(/bg-\[var\(--teal\)\]/);
 });
 
@@ -96,6 +100,7 @@ test("cart can add a real storefront product", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Revisa tu pedido." })).toBeVisible();
   await expect(page.getByText("SUMMER 3X").first()).toBeVisible();
   await expect(page.getByText("3 Luzelas por pack").first()).toBeVisible();
+  await expect(page.getByText("$819.00", {exact:true}).first()).toBeVisible();
   await expect(page.locator('[data-pack-bottle="cart-3x"]')).toHaveCount(3);
   await expect(page.locator('input[type="number"]').first()).toHaveValue("1");
   await expect(page.getByText("Subtotal").first()).toBeVisible();
@@ -109,6 +114,90 @@ test("cart can add a real storefront product", async ({ page }) => {
   const visibleCheckoutBottles = await page.evaluate(
     () =>
       Array.from(document.querySelectorAll('[data-pack-bottle="checkout-3x"]')).filter(
+        (element) => {
+          const rect = element.getBoundingClientRect();
+          const style = getComputedStyle(element);
+
+          return (
+            rect.width > 0 &&
+            rect.height > 0 &&
+            style.display !== "none" &&
+            style.visibility !== "hidden"
+          );
+        },
+      ).length,
+  );
+  expect(visibleCheckoutBottles).toBe(3);
+});
+
+test("wholesale Pack 10 stays one commercial line with ten physical units", async ({ page }) => {
+  await page.goto("/");
+
+  const pack10Card = page
+    .locator("article")
+    .filter({ has: page.getByRole("heading", { name: "LUZELA · Pack 10" }) });
+
+  if ((await pack10Card.count()) === 0) {
+    await expect(page.getByText("LUZELA · Pack 10")).toHaveCount(0);
+    test.info().annotations.push({
+      type: "note",
+      description:
+        "Pack 10 is hidden in the current storefront catalog; commercial-unit coverage remains in checkout unit tests.",
+    });
+    return;
+  }
+
+  await expect(pack10Card).toBeVisible();
+  await expect(pack10Card.getByText("10 PIEZAS", { exact: true })).toBeVisible();
+  await expect(pack10Card.getByText("$2,220.00", { exact: true })).toBeVisible();
+  await expect(pack10Card.getByText("$222.00 c/u", { exact: true })).toBeVisible();
+  await expect(pack10Card.getByText("Envío incluido", { exact: true })).toBeVisible();
+
+  const buyPack = pack10Card.getByRole("link", { name: "Comprar pack", exact: true });
+  await expect(buyPack).toHaveAttribute("href", /\/cart\?variant=.*quantity=1/);
+  await buyPack.click();
+
+  await expect(page).toHaveURL(/\/cart/);
+  await expect(page.getByText("LUZELA · Pack 10").first()).toBeVisible();
+  await expect(page.getByText("Incluye: 10 piezas").first()).toBeVisible();
+  await expect(page.getByText("$2,220.00").first()).toBeVisible();
+  await expect(page.getByText("Luzelas físicas")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Continuar al checkout" })).toHaveAttribute(
+    "href",
+    /\/checkout\?variant=.*quantity=1/,
+  );
+
+  const visibleCartBottles = await page.evaluate(
+    () =>
+      Array.from(document.querySelectorAll('[data-pack-bottle="cart-10x"]')).filter(
+        (element) => {
+          const rect = element.getBoundingClientRect();
+          const style = getComputedStyle(element);
+
+          return (
+            rect.width > 0 &&
+            rect.height > 0 &&
+            style.display !== "none" &&
+            style.visibility !== "hidden"
+          );
+        },
+      ).length,
+  );
+  expect(visibleCartBottles).toBe(3);
+
+  await page.getByRole("link", { name: "Continuar al checkout" }).click();
+  await expect(page.getByRole("heading", { name: /Compra rápida/i })).toBeVisible();
+  const checkoutSummary = page.locator("aside").filter({ hasText: "LUZELA · Pack 10" });
+  await expect(checkoutSummary.getByText("LUZELA · Pack 10")).toBeVisible();
+  await expect(checkoutSummary.getByText("Cantidad: 1 pack")).toBeVisible();
+  await expect(checkoutSummary.getByText("10 Luzelas físicas")).toBeVisible();
+  await expect(checkoutSummary.getByText("Incluye: 10 piezas")).toBeVisible();
+  await expect(checkoutSummary.getByText("$2,220.00").first()).toBeVisible();
+  await expect(checkoutSummary.getByText("Incluido").first()).toBeVisible();
+
+  const visibleCheckoutBottles = await page.evaluate(
+    () =>
+      Array.from(document.querySelectorAll('[data-pack-bottle="checkout-10x"]')).filter(
         (element) => {
           const rect = element.getBoundingClientRect();
           const style = getComputedStyle(element);

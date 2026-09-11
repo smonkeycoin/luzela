@@ -1,13 +1,35 @@
-export default function AdminShippingPage() {
+import { getAdminShipping } from "@/lib/admin/queries";
+
+import { ShippingOperationsCenter } from "./shipping-operations-center";
+
+export default async function AdminShippingPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const query = searchParams ? await searchParams : {};
+  const value = (key: string) => {
+    const current = query[key];
+
+    return Array.isArray(current) ? current[0] : current;
+  };
+  const shipping = await getAdminShipping({
+    view: value("view"),
+    filter: value("filter"),
+    q: value("q") || "",
+    product: value("product") || "all",
+    email: value("email") || "all",
+    carrier: value("carrier") || "all",
+    page: value("page") || "1",
+    pageSize: value("pageSize") || "25",
+  });
+
   return (
-    <main className="px-4 py-6 sm:px-6 lg:px-8">
-      <h1 className="text-3xl font-semibold">Shipping</h1>
-      <section className="surface mt-6 rounded-[8px] p-5">
-        <p className="text-sm leading-6 text-[var(--muted)]">
-          Shipments soportara carrier, tracking, fechas y transiciones de
-          preparing a delivered sin mezclar fulfillment con pago.
-        </p>
-      </section>
-    </main>
+    <ShippingOperationsCenter
+      {...shipping}
+      result={value("result") || ""}
+      emailResult={value("emailResult") || ""}
+      reason={value("reason") || ""}
+    />
   );
 }

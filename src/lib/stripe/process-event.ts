@@ -271,23 +271,12 @@ async function confirmPaidOrder(
   if (beforeOrder?.payment_status !== "paid") {
     const { data: order } = await supabase
       .from("orders")
-      .select("id, order_number, total_cents, currency, customers(email)")
+      .select("id")
       .eq("id", orderId)
       .single();
 
-    const customer = Array.isArray(order?.customers)
-      ? order?.customers[0]
-      : order?.customers;
-    const email = customer?.email;
-
-    if (order && email) {
-      await sendOrderConfirmedEmail({
-        orderId,
-        orderNumber: order.order_number as string,
-        email: email as string,
-        totalCents: order.total_cents as number,
-        currency: order.currency as string,
-      });
+    if (order) {
+      await sendOrderConfirmedEmail({ orderId });
     }
   }
 }

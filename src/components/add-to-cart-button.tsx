@@ -5,9 +5,11 @@ import type { CatalogProduct } from "@/lib/catalog/types";
 
 export function AddToCartButton({ product, featured = false }: { product: CatalogProduct; featured?: boolean }) {
   const available = product.variant.stock_on_hand > 0;
-  const label = product.variant.analytics_item_id.startsWith("summer_")
-    ? `Elegir ${product.variant.units_per_pack}X`
-    : "Comprar";
+  const label = product.variant.analytics_item_id === "luzela_pack_10"
+    ? "Comprar pack"
+    : product.variant.analytics_item_id.startsWith("summer_")
+      ? `Elegir ${product.variant.units_per_pack}X`
+      : "Comprar";
 
   return (
     <Link

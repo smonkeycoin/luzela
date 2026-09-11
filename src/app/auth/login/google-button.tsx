@@ -5,7 +5,28 @@ import { LogIn } from "lucide-react";
 
 import { createSupabaseBrowserClient } from "@/lib/supabase/browser";
 
-export function GoogleLoginButton() {
+function getAuthRedirectOrigin() {
+  const configuredOrigin = process.env.NEXT_PUBLIC_APP_URL?.replace(/\/$/, "");
+
+  if (
+    process.env.NODE_ENV === "production" &&
+    window.location.hostname.endsWith("luzela.mx")
+  ) {
+    return window.location.origin;
+  }
+
+  if (process.env.NODE_ENV === "production" && configuredOrigin) {
+    return configuredOrigin;
+  }
+
+  return window.location.origin;
+}
+
+export function GoogleLoginButton({
+  destination = "admin",
+}: {
+  destination?: "admin" | "collab";
+}) {
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -14,10 +35,12 @@ export function GoogleLoginButton() {
     setLoading(true);
     setError(null);
 
+    // Routing hint only, never an access credential. Reuse the already authorized callback URL.
+    document.cookie = `luzela_auth_destination=${destination}; Path=/; Max-Age=600; SameSite=Lax${window.location.protocol === "https:" ? "; Secure" : ""}`;
     const { error: loginError } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: `${getAuthRedirectOrigin()}/auth/callback`,
       },
     });
 

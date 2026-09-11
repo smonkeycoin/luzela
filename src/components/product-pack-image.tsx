@@ -82,23 +82,24 @@ export function ProductPackImage({
   context: ProductPackImageContext;
   unitsPerPack: number;
 }) {
-  const count = Math.max(1, Math.min(unitsPerPack, 3));
-  const opticalOffset = getOpticalOffset(count, context);
+  const displayCount = Math.max(1, Math.min(unitsPerPack, 3));
+  const opticalOffset = getOpticalOffset(displayCount, context);
+  const isWholesale = unitsPerPack > displayCount;
 
   return (
     <div
-      className={`relative grid place-items-center overflow-hidden border bg-white ${contextClasses[context]} ${getStageTone(count, context)}`}
-      data-pack-image={`${context}-${count}x`}
+      className={`relative grid place-items-center overflow-hidden border bg-white ${contextClasses[context]} ${getStageTone(displayCount, context)}`}
+      data-pack-image={`${context}-${unitsPerPack}x`}
     >
       <div
-        className={`relative ${getBottleHeight(count, context)}`}
-        style={{ width: `${getStackWidth(count, context)}px` }}
+        className={`relative ${getBottleHeight(displayCount, context)}`}
+        style={{ width: `${getStackWidth(displayCount, context)}px` }}
       >
-        {Array.from({ length: count }).map((_, index) => (
+        {Array.from({ length: displayCount }).map((_, index) => (
           <Image
             key={index}
             src="/luzela/bottle.webp"
-            alt={index === count - 1 ? alt : ""}
+            alt={index === displayCount - 1 ? alt : ""}
             width={700}
             height={1050}
             sizes={
@@ -109,16 +110,21 @@ export function ProductPackImage({
                   : "150px"
             }
             className="absolute left-1/2 top-[80%] h-full w-auto -translate-x-1/2 -translate-y-1/2 object-contain drop-shadow-xl"
-            data-pack-bottle={`${context}-${count}x`}
+            data-pack-bottle={`${context}-${unitsPerPack}x`}
             style={{
-              transform: `translate3d(calc(-50% + ${getOffset(count, index, context) + opticalOffset.x}px), calc(-50% + ${opticalOffset.y}px), 0)`,
+              transform: `translate3d(calc(-50% + ${getOffset(displayCount, index, context) + opticalOffset.x}px), calc(-50% + ${opticalOffset.y}px), 0)`,
               zIndex: index + 1,
             }}
           />
         ))}
       </div>
+      {isWholesale ? (
+        <span className="absolute right-3 top-3 border border-[var(--teal)]/30 bg-[var(--background)] px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-[var(--teal)] sm:text-xs">
+          {unitsPerPack} piezas
+        </span>
+      ) : null}
       <span className="sr-only">
-        {count} botella{count === 1 ? "" : "s"} Luzela
+        {unitsPerPack} pieza{unitsPerPack === 1 ? "" : "s"} Luzela
       </span>
     </div>
   );

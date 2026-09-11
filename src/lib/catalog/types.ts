@@ -3,6 +3,7 @@ export type CatalogProduct = {
   slug: string;
   name: string;
   description: string | null;
+  category: string | null;
   free_shipping: boolean;
   sort_order: number;
   image_url: string | null;
@@ -12,9 +13,15 @@ export type CatalogProduct = {
     name: string;
     price_cents: number;
     compare_at_price_cents: number | null;
+    offer_price_cents: number | null;
+    offer_active: boolean;
+    effective_price_cents: number;
+    price_per_unit_cents: number;
+    discount_cents: number;
     currency: string;
     stock_on_hand: number;
     physical_stock_on_hand: number;
+    stock_label: string;
     units_per_pack: number;
     inventory_variant_id: string;
     analytics_item_id: string;

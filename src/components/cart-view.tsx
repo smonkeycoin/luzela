@@ -6,6 +6,7 @@ import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import type { CatalogProduct } from "@/lib/catalog/types";
 import { formatMoney } from "@/lib/money";
 
+import { CartPromoSummary } from "./cart-promo-summary";
 import { PaymentLogos } from "./payment-logos";
 import { ProductPackImage } from "./product-pack-image";
 import { type CartItem, useCart } from "./cart-store";
@@ -30,10 +31,11 @@ export function CartView({
     })
     .filter((item): item is { product: CatalogProduct; quantity: number } => Boolean(item));
   const subtotalCents = hydratedItems.reduce(
-    (total, item) => total + item.product.variant.price_cents * item.quantity,
+    (total, item) => total + item.product.variant.effective_price_cents * item.quantity,
     0,
   );
   const firstItem = hydratedItems[0];
+  const canQuoteCart = hydratedItems.length === 1 && firstItem.product.free_shipping;
 
   if (!ready) {
     return (
@@ -81,11 +83,30 @@ export function CartView({
                 <div>
                   <h2 className="text-xl font-semibold text-[var(--ink)]">{product.name}</h2>
                   <p className="mt-1 text-sm text-[var(--muted)]">{product.variant.name}</p>
-                  <p className="mt-1 text-sm text-[var(--muted)]">
-                    {product.variant.units_per_pack} Luzela{product.variant.units_per_pack === 1 ? "" : "s"} por pack
-                  </p>
+                  {product.variant.units_per_pack >= 10 ? (
+                    <p className="mt-1 text-sm font-semibold text-[var(--ink)]">
+                      Incluye: {product.variant.units_per_pack} piezas
+                    </p>
+                  ) : (
+                    <p className="mt-1 text-sm text-[var(--muted)]">
+                      {product.variant.units_per_pack} Luzela{product.variant.units_per_pack === 1 ? "" : "s"} por pack
+                    </p>
+                  )}
+                  {product.variant.offer_active && product.variant.offer_price_cents ? (
+                    <div className="mt-3">
+                      <p className="text-sm font-semibold text-[var(--muted)] line-through">
+                        {formatMoney(product.variant.price_cents, product.variant.currency)}
+                      </p>
+                      <p className="text-lg font-semibold text-[var(--teal)]">
+                        {formatMoney(
+                          product.variant.effective_price_cents,
+                          product.variant.currency,
+                        )}
+                      </p>
+                    </div>
+                  ) : null}
                   <p className={`mt-3 text-sm font-semibold ${available ? "text-[var(--teal)]" : "text-[var(--coral)]"}`}>
-                    {available ? "Disponible" : "Sin stock disponible"}
+                    {product.variant.stock_label}
                   </p>
                 </div>
                 <div className="inline-flex h-11 w-fit items-center border border-[var(--line)] bg-white">
@@ -125,7 +146,7 @@ export function CartView({
               </div>
               <div className="flex items-center justify-between gap-4 sm:grid sm:justify-items-end">
                 <p className="text-lg font-semibold text-[var(--ink)]">
-                  {formatMoney(product.variant.price_cents * quantity, product.variant.currency)}
+                  {formatMoney(product.variant.effective_price_cents * quantity, product.variant.currency)}
                 </p>
                 <button
                   type="button"
@@ -159,6 +180,7 @@ export function CartView({
               )}
             </dd>
           </div>
+          {!canQuoteCart ? <>
           <div className="flex justify-between gap-4 border-b border-[var(--line)] pb-3">
             <dt className="text-[var(--muted)]">Subtotal</dt>
             <dd className="font-semibold">{formatMoney(subtotalCents, firstItem.product.variant.currency)}</dd>
@@ -177,13 +199,19 @@ export function CartView({
                 : "Se confirma en checkout"}
             </dd>
           </div>
+          </> : null}
         </dl>
+        {canQuoteCart ? (
+          <CartPromoSummary variant={firstItem.product.variant.id} quantity={firstItem.quantity}
+            price={firstItem.product.variant.effective_price_cents} currency={firstItem.product.variant.currency} />
+        ) : (
         <Link
           href={`/checkout?variant=${firstItem.product.variant.id}&quantity=${firstItem.quantity}`}
           className="focus-ring mt-6 inline-flex h-12 w-full items-center justify-center bg-[var(--ink)] px-5 text-sm font-semibold text-white"
         >
           Continuar al checkout
         </Link>
+        )}
         {hydratedItems.length > 1 ? (
           <p className="mt-3 text-xs leading-5 text-[var(--muted)]">
             Puedes finalizar un producto a la vez en el checkout seguro.

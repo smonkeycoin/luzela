@@ -10,7 +10,8 @@ export async function GET(request: Request) {
     await supabase.auth.signOut();
   }
 
-  return NextResponse.redirect(`${origin}/auth/login`);
+  const target = new URL(request.url).searchParams.get("next") === "collab" ? "/collab/login" : "/auth/login";
+  return NextResponse.redirect(`${origin}${target}`);
 }
 
 export async function POST(request: Request) {

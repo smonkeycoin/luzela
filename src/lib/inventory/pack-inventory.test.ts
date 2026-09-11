@@ -8,7 +8,9 @@ describe("pack inventory semantics", () => {
     expect(getPhysicalUnitsRequired(1, 1)).toBe(1);
     expect(getPhysicalUnitsRequired(1, 2)).toBe(2);
     expect(getPhysicalUnitsRequired(1, 3)).toBe(3);
+    expect(getPhysicalUnitsRequired(1, 10)).toBe(10);
     expect(getPhysicalUnitsRequired(2, 3)).toBe(6);
+    expect(getPhysicalUnitsRequired(2, 10)).toBe(20);
   });
 
   it("derives pack availability from physical stock", () => {
@@ -16,6 +18,9 @@ describe("pack inventory semantics", () => {
     expect(getAvailablePacks(2, 2)).toBe(1);
     expect(getAvailablePacks(2, 3)).toBe(0);
     expect(getAvailablePacks(5, 3)).toBe(1);
+    expect(getAvailablePacks(9, 10)).toBe(0);
+    expect(getAvailablePacks(10, 10)).toBe(1);
+    expect(getAvailablePacks(21, 10)).toBe(2);
   });
 
   it("applies physical unit movement once for duplicate webhook keys", () => {

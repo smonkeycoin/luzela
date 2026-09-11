@@ -1,10 +1,37 @@
-insert into public.app_settings (key, value)
+insert into public.app_settings (key, value, public_read)
 values
-  ('currency', '"mxn"'::jsonb),
-  ('low_stock_threshold', '10'::jsonb),
-  ('shipping.flat_rate_cents', '12000'::jsonb),
-  ('shipping.free_shipping_enabled', 'true'::jsonb)
-on conflict (key) do update set value = excluded.value;
+  ('store_name', '"Luzela"'::jsonb, true),
+  ('default_country', '"México"'::jsonb, true),
+  ('timezone', '"America/Mexico_City"'::jsonb, true),
+  ('locale', '"es-MX"'::jsonb, true),
+  ('currency_code', '"MXN"'::jsonb, true),
+  ('low_stock_threshold', '20'::jsonb, false),
+  ('critical_stock_threshold', '10'::jsonb, false),
+  ('show_exact_stock_publicly', 'false'::jsonb, true),
+  ('default_carrier', '"DHL"'::jsonb, false),
+  ('carrier_display_name', '"DHL Express"'::jsonb, true),
+  ('shipping_min_days', '2'::jsonb, true),
+  ('shipping_max_days', '5'::jsonb, true),
+  ('shipping_business_days', 'true'::jsonb, true),
+  ('free_shipping_enabled', 'true'::jsonb, true),
+  ('shipping_fee_cents', '0'::jsonb, true),
+  (
+    'shipping_policy_short',
+    '"Envío incluido a todo México. Entrega estimada de 2 a 5 días hábiles mediante DHL Express."'::jsonb,
+    true
+  ),
+  ('transactional_emails_enabled', 'true'::jsonb, false),
+  ('order_confirmation_email_enabled', 'true'::jsonb, false),
+  ('shipping_confirmation_email_enabled', 'true'::jsonb, false),
+  ('resend_from_name', '"Luzela"'::jsonb, false),
+  ('resend_from_email', '"orders@luzela.mx"'::jsonb, false),
+  ('reply_to_email', '""'::jsonb, false),
+  ('customer_notes_enabled', 'true'::jsonb, false),
+  ('analytics_enabled', 'true'::jsonb, false),
+  ('public_reviews_enabled', 'true'::jsonb, true)
+on conflict (key) do update
+set value = excluded.value,
+    public_read = excluded.public_read;
 
 insert into public.products (slug, name, description, status, sort_order)
 values

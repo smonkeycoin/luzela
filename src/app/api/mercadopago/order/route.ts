@@ -5,6 +5,7 @@ import {
   centsToMercadoPagoAmount,
   createMercadoPagoOrder,
 } from "@/lib/mercadopago/client";
+import { createAttemptSignature } from "@/lib/checkout/idempotency";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 const mercadoPagoOrderRequestSchema = z.object({
@@ -41,7 +42,7 @@ export async function POST(request: Request) {
 
   const { data: checkoutSession } = await supabase
     .from("checkout_sessions")
-    .select("id, order_id, provider_order_id, email")
+    .select("id, order_id, provider_order_id, email, metadata")
     .eq("id", parsed.data.checkout_session_id)
     .eq("provider", "mercadopago")
     .maybeSingle();
@@ -52,7 +53,7 @@ export async function POST(request: Request) {
 
   const { data: payment } = await supabase
     .from("payments")
-    .select("id, amount_cents, currency, provider_order_id")
+    .select("id, amount_cents, currency, provider_order_id, status, idempotency_key")
     .eq("order_id", checkoutSession.order_id)
     .eq("provider", "mercadopago")
     .maybeSingle();
@@ -66,11 +67,54 @@ export async function POST(request: Request) {
   }
 
   const amount = centsToMercadoPagoAmount(payment.amount_cents as number);
+  const providerIdempotencyKey = `mp-order:${checkoutSession.id}`;
+  const checkoutMetadata =
+    checkoutSession.metadata && typeof checkoutSession.metadata === "object"
+      ? (checkoutSession.metadata as Record<string, unknown>)
+      : {};
+  const providerRequestSignature = createAttemptSignature({
+    amount,
+    checkout_session_id: checkoutSession.id,
+    installments: parsed.data.installments,
+    order_id: checkoutSession.order_id,
+    payer_email: parsed.data.payer.email.toLowerCase(),
+    payment_method_id: parsed.data.payment_method_id,
+    payment_method_type: parsed.data.payment_method_type,
+    token: parsed.data.token,
+  });
+  const existingProviderSignature =
+    typeof checkoutMetadata.mercadopago_request_signature === "string"
+      ? checkoutMetadata.mercadopago_request_signature
+      : null;
+
+  if (
+    existingProviderSignature &&
+    existingProviderSignature !== providerRequestSignature
+  ) {
+    return NextResponse.json(
+      { error: "payment_attempt_payload_changed" },
+      { status: 409 },
+    );
+  }
+
+  if (!existingProviderSignature) {
+    await supabase
+      .from("checkout_sessions")
+      .update({
+        metadata: {
+          ...checkoutMetadata,
+          mercadopago_request_signature: providerRequestSignature,
+          mercadopago_idempotency_key: providerIdempotencyKey,
+        },
+      })
+      .eq("id", checkoutSession.id);
+  }
+
   let order;
 
   try {
     order = await createMercadoPagoOrder({
-      idempotencyKey: `mp-order:${checkoutSession.id}`,
+      idempotencyKey: providerIdempotencyKey,
       totalAmount: amount,
       externalReference: checkoutSession.order_id as string,
       payer: {
@@ -89,7 +133,12 @@ export async function POST(request: Request) {
     const message = error instanceof Error ? error.message : "mercadopago_order_create_failed";
 
     return NextResponse.json(
-      { error: message },
+      {
+        error:
+          message === "mercadopago_access_token_missing"
+            ? message
+            : "payment_temporarily_unavailable",
+      },
       { status: message === "mercadopago_access_token_missing" ? 501 : 502 },
     );
   }
