@@ -1,4 +1,4 @@
-function Cayena({ className }: { className: string }) {
+function Cayena({ className, id }: { className: string; id: string }) {
   return (
     <svg
       viewBox="0 0 120 120"
@@ -7,14 +7,21 @@ function Cayena({ className }: { className: string }) {
       className={className}
       data-cayena
     >
-      <g stroke="currentColor" strokeWidth="1.1" strokeLinecap="round" strokeLinejoin="round">
-        <path fill="currentColor" fillOpacity=".12" d="M57 64C42 62 18 49 16 34C14 23 30 19 39 25C35 12 44 5 53 10C65 17 67 38 60 60C71 44 78 19 93 18C104 18 108 28 100 38C113 34 119 44 113 53C104 65 82 67 64 65C83 68 109 74 108 91C108 101 96 104 88 97C91 111 79 118 70 110C60 102 58 82 60 69C54 87 46 111 30 108C20 107 18 96 25 88C11 92 5 82 12 73C23 61 43 62 57 64Z" />
-        <path d="M57 62C48 48 32 30 24 29M57 61C59 41 54 23 48 15M62 62C77 48 87 35 92 26M63 65C83 60 100 52 109 45M62 68C80 79 92 86 101 92M59 70C65 86 71 98 77 105M55 67C41 78 31 93 29 100M54 64C35 68 22 76 16 80" />
-        <path d="M59 65C51 57 53 42 70 28" strokeWidth="2" />
-        <path d="M64 36L60 29M68 31L66 23M70 28L75 25" />
-        <g fill="currentColor" stroke="none">
-          <circle cx="60" cy="28" r="2" /><circle cx="66" cy="22" r="2" />
-          <circle cx="75" cy="25" r="2.3" /><circle cx="58" cy="36" r="1.5" />
+      <defs>
+        <radialGradient id={`${id}-petal`} cx="50%" cy="55%" r="58%">
+          <stop offset="0" stopColor="#8c143b" />
+          <stop offset=".35" stopColor="#d51e54" />
+          <stop offset="1" stopColor="#f06278" />
+        </radialGradient>
+      </defs>
+      <g stroke="#a91845" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round">
+        <path fill={`url(#${id}-petal)`} d="M59 62C43 62 18 51 15 36C13 25 29 19 40 27C34 13 43 5 54 11C67 19 68 40 61 59C72 43 80 19 95 19C108 19 111 31 101 41C115 36 121 48 113 58C104 69 82 68 65 64C84 69 109 78 106 93C104 104 91 104 84 95C86 111 72 116 64 105C56 95 58 79 60 68C52 87 41 108 26 104C16 101 16 89 25 82C10 84 5 73 14 65C25 56 44 60 59 62Z" />
+        <path d="M59 62C47 48 33 34 23 32M59 61C59 42 55 24 49 16M63 61C77 47 88 33 95 25M64 64C84 61 101 53 112 46M63 68C80 78 94 88 101 96M59 69C63 87 69 99 75 107M55 67C42 78 32 90 27 99M54 64C37 67 22 74 14 78" stroke="#f7a0ae" opacity=".65" />
+        <circle cx="60" cy="64" r="7" fill="#8f173d" stroke="none" />
+        <path d="M60 64C57 51 60 40 75 27" stroke="#f5c95c" strokeWidth="3" />
+        <g fill="#f5c95c" stroke="none">
+          <circle cx="69" cy="33" r="2.4" /><circle cx="74" cy="27" r="2.8" />
+          <circle cx="77" cy="31" r="2.1" /><circle cx="65" cy="38" r="1.8" />
         </g>
       </g>
     </svg>
@@ -25,14 +32,24 @@ export function ChavolinesPackFeature() {
   return (
     <div
       data-chavolines-feature
-      className="relative isolate flex min-h-[88px] items-center justify-end overflow-hidden border-x border-t border-[var(--teal)]/30 bg-[#faf8f3] px-4 py-3"
+      className="pointer-events-none absolute -right-2 -top-2 z-20 h-[132px] w-[220px] sm:right-0 sm:top-0 sm:h-[142px] sm:w-[236px]"
     >
-      <Cayena className="pointer-events-none absolute -left-2 -top-3 size-[112px] -rotate-12 text-[#ba4d68] opacity-30" />
-      <Cayena className="pointer-events-none absolute bottom-0 left-[76px] size-[62px] rotate-[22deg] text-[#d57869] opacity-25" />
-      <p className="relative text-right font-semibold uppercase leading-tight text-[var(--teal)]">
-        <span className="block text-[10px] tracking-[.19em]">EL FAVORITO</span>
-        <span className="mt-1 block text-[9px] tracking-[.19em]">DE LOS</span>
-        <span className="mt-1 block text-[15px] tracking-[.08em]">CHAVOLINES</span>
+      <div
+        className="absolute right-1 top-3 grid h-[112px] w-[202px] -rotate-[3deg] place-items-center bg-[#fffaf0] px-8 py-4 shadow-[0_5px_16px_rgba(61,45,32,.16)] sm:w-[216px]"
+        style={{ clipPath: "polygon(3% 5%, 95% 0, 100% 13%, 97% 27%, 100% 42%, 97% 58%, 100% 72%, 96% 88%, 99% 98%, 74% 95%, 56% 100%, 36% 96%, 15% 100%, 0 92%, 3% 72%, 0 56%, 3% 39%, 0 20%)" }}
+      >
+        <p className="-rotate-1 text-center font-black uppercase leading-[.92] text-[var(--teal)] [font-family:ui-rounded,'Trebuchet_MS',sans-serif]">
+          <span className="block text-[16px] tracking-[.05em]">EL FAVORITO</span>
+          <span className="mt-1 block text-[13px] tracking-[.11em]">DE LOS</span>
+          <span className="mt-1 block text-[20px] tracking-[.015em]">CHAVOLINES</span>
+        </p>
+      </div>
+      <Cayena id="cayena-main" className="absolute -right-2 top-[2px] size-[64px] rotate-[10deg] drop-shadow-[0_4px_4px_rgba(134,17,55,.2)]" />
+      <Cayena id="cayena-small" className="absolute -bottom-1 right-[15px] size-[48px] -rotate-[18deg] drop-shadow-[0_3px_4px_rgba(134,17,55,.18)]" />
+      <span className="absolute left-[7px] top-[42px] h-5 w-3 -rotate-[34deg] rounded-[100%_0_100%_0] bg-[#e62f61] shadow-sm" />
+      <span className="absolute bottom-[10px] left-[18px] h-4 w-2 rotate-[28deg] rounded-[100%_0_100%_0] bg-[#f05472] shadow-sm" />
+      <p className="sr-only">
+        El favorito de los Chavolines
       </p>
     </div>
   );

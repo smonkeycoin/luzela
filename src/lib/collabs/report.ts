@@ -106,6 +106,7 @@ export function salesCsv(rows: SafeSale[]) {
     "discount",
     "net_merchandise",
     "status",
+    "attribution_source",
   ] as const;
   return (
     fields.join(",") +
@@ -115,11 +116,11 @@ export function salesCsv(rows: SafeSale[]) {
         fields
           .map((field) =>
             escape(
-              ["gross_merchandise", "discount", "net_merchandise"].includes(
-                field,
-              )
-                ? (Number(row[field]) / 100).toFixed(2)
-                : row[field],
+              field === "attribution_source"
+                ? row.source
+                : ["gross_merchandise", "discount", "net_merchandise"].includes(field)
+                  ? (Number(row[field as keyof SafeSale]) / 100).toFixed(2)
+                  : row[field as keyof SafeSale],
             ),
           )
           .join(","),

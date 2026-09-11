@@ -162,11 +162,15 @@ export function ShopSection({ products, error }: { products: CatalogProduct[]; e
                   }`}
                 >
                   <div data-travel-duo-visual={featured ? "true" : undefined}>
-                    {product.slug === "summer-3x" ? <ChavolinesPackFeature /> : null}
                     {summer ? (
                       <ProductPackImage
                         alt={`${product.name} ${product.variant.units_per_pack}X`}
                         context="card"
+                        feature={
+                          product.slug === "summer-3x" ? (
+                            <ChavolinesPackFeature />
+                          ) : undefined
+                        }
                         unitsPerPack={product.variant.units_per_pack}
                       />
                     ) : (

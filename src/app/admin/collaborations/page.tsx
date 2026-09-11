@@ -163,9 +163,9 @@ export default async function Page({
                   {m.email} · {m.role} · {m.status}
                 </p>
                 <p className="mt-1 text-xs text-[var(--muted)]">
-                  {m.accepted_at
-                    ? "Acceso aceptado"
-                    : "Pendiente de primer acceso"}{" "}
+                  Último acceso: {m.last_login_at
+                    ? new Date(m.last_login_at).toLocaleString("es-MX", { timeZone: "America/Cancun" })
+                    : "Aún no disponible"}{" "}
                   ·{" "}
                   {m.invited_at
                     ? "Invitación enviada"
@@ -178,7 +178,7 @@ export default async function Page({
                       className={button}
                       disabled={!write || m.status !== "active"}
                     >
-                      Enviar invitación
+                      {m.invited_at ? "Reenviar invitación" : "Enviar invitación"}
                     </button>
                   </form>
                   <form action={setMemberStatus}>
@@ -193,7 +193,7 @@ export default async function Page({
                       disabled={!write}
                     >
                       {m.status === "active"
-                        ? "Revocar acceso"
+                        ? "Desactivar acceso"
                         : "Reactivar acceso"}
                     </button>
                   </form>

@@ -105,11 +105,14 @@ describe("collaboration pricing and attribution", () => {
         discount: 6900,
         net_merchandise: 62100,
         status: "paid",
+        source: "coupon",
         customer_email: "private@example.com",
       } as unknown as SafeSale,
     ]);
     expect(csv).toContain("'=EVIL()");
     expect(csv).toContain("621.00");
+    expect(csv).toContain("attribution_source");
+    expect(csv).toContain("coupon");
     expect(csv).not.toContain("private@example.com");
     expect(csv).not.toContain("shipping");
   });

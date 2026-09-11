@@ -26,11 +26,14 @@ export default async function Page({
         </p>
         {error ? (
           <p role="alert" className="mb-5 text-sm text-[var(--coral)]">
-            No pudimos autorizar tu acceso. Usa el correo de tu invitación o
-            contacta a LUZELA.
+            Esta cuenta no tiene acceso a este panel. Usa el correo exacto de
+            tu invitación o contacta a LUZELA.
           </p>
         ) : null}
-        <GoogleLoginButton destination="collab" />
+        <GoogleLoginButton
+          destination="collab"
+          label={error ? "Cambiar cuenta de Google" : undefined}
+        />
       </section>
     </main>
   );

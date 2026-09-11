@@ -16,7 +16,10 @@ for (const width of [390,768,1440]) {
     await expect(card.getByText("$273.00 c/u",{exact:true})).toBeVisible();
     const markBox=await mark.boundingBox();
     const imageBox=await card.locator('[data-pack-image="card-3x"]').boundingBox();
-    expect(markBox!.y+markBox!.height).toBeLessThanOrEqual(imageBox!.y+1);
+    expect(markBox!.x).toBeGreaterThanOrEqual(imageBox!.x-10);
+    expect(markBox!.y).toBeGreaterThanOrEqual(imageBox!.y-10);
+    expect(markBox!.x+markBox!.width).toBeLessThanOrEqual(imageBox!.x+imageBox!.width+10);
+    expect(markBox!.y+markBox!.height).toBeLessThanOrEqual(imageBox!.y+imageBox!.height+10);
     for(const image of await card.locator('[data-pack-bottle="card-3x"]').all()) {
       await expect(image).toHaveAttribute('src',/bottle\.webp/);
     }

@@ -22,6 +22,7 @@ try {
   for (const name of [
     "20260910200313_collab_engine_v1.sql",
     "20260910200422_collab_trigger_grants_hardening.sql",
+    "20260911024133_chavolines_viewer_access.sql",
   ]) {
     await db.exec(fs.readFileSync(`supabase/migrations/${name}`, "utf8"));
   }

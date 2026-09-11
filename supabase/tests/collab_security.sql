@@ -33,6 +33,7 @@ set local role authenticated;
 do $$ declare n integer; report jsonb; target uuid; begin
  select public.accept_collab_membership() into n;
  if n<>1 then raise exception 'TEST: Google member acceptance failed'; end if;
+ if not exists(select 1 from public.collaborator_members where user_id='aaaaaaaa-0000-4000-8000-000000000001' and last_login_at is not null) then raise exception 'TEST: last login not recorded'; end if;
  select id into target from public.collaborators where slug='chavolines';
  report=public.collab_report(target,now()-interval '1 day',now()+interval '1 day');
  if (report->>'orders')::int<>1 or (report->>'net_merchandise')::int<>62100 or (report->>'shipping')::int<>18900 or (report->>'total')::int<>81000 then raise exception 'TEST: financial semantics incorrect'; end if;

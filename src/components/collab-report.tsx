@@ -43,14 +43,14 @@ export async function CollabReportView({
   previous.set("page", String(page - 1));
   const kpis: [string, string][] = [
     ["Pedidos atribuidos", String(report.orders)],
-    ["Ventas netas de mercancía", money(report.net_merchandise)],
-    ["Descuento otorgado", money(report.discount)],
     ["Unidades vendidas", String(report.units)],
+    ["Mercancía antes de descuento", money(report.gross_merchandise)],
+    ["Descuento otorgado", money(report.discount)],
+    ["Ventas netas de mercancía", money(report.net_merchandise)],
     ["Ticket promedio · mercancía", money(report.aov)],
   ];
   if (admin)
     kpis.push(
-      ["Mercancía antes de descuento", money(report.gross_merchandise)],
       ["Envío cobrado", money(report.shipping)],
       ["Total cobrado", money(report.total)],
     );
@@ -135,6 +135,7 @@ export async function CollabReportView({
                 "Descuento",
                 "Venta neta",
                 "Estado",
+                "Atribución",
               ].map((h) => (
                 <th key={h} className="p-3">
                   {h}
@@ -162,6 +163,7 @@ export async function CollabReportView({
                 <td className="p-3">
                   {row.fulfillment_status} · {row.status}
                 </td>
+                <td className="p-3 capitalize">{row.source}</td>
               </tr>
             ))}
           </tbody>
@@ -179,9 +181,9 @@ export async function CollabReportView({
           <Link href={`${base}?${next}`}>Siguiente →</Link>
         ) : null}
       </nav>
-      {admin ? (
-        <div className="mt-8 grid gap-5 md:grid-cols-2">
-          <div>
+      <div className="mt-8 grid gap-5 md:grid-cols-2">
+        {admin ? (
+          <div className="rounded-xl border border-[var(--line)] bg-white p-5">
             <h3 className="font-semibold">Origen de atribución</h3>
             {report.sources.map((s) => (
               <p key={s.source} className="mt-3 text-sm">
@@ -189,16 +191,18 @@ export async function CollabReportView({
               </p>
             ))}
           </div>
-          <div>
-            <h3 className="font-semibold">Mix de producto</h3>
-            {report.products.map((p) => (
-              <p key={p.product} className="mt-3 text-sm">
-                {p.product}: {p.units} unidades · {money(p.net_merchandise)}
-              </p>
-            ))}
-          </div>
+        ) : null}
+        <div className="rounded-xl border border-[var(--line)] bg-white p-5">
+          <h3 className="font-semibold">Mix de producto</h3>
+          {report.products.length ? report.products.map((p) => (
+            <p key={p.product} className="mt-3 text-sm">
+              {p.product}: {p.units} unidades · {money(p.net_merchandise)}
+            </p>
+          )) : (
+            <p className="mt-3 text-sm text-[var(--muted)]">Sin ventas en este periodo.</p>
+          )}
         </div>
-      ) : null}
+      </div>
     </section>
   );
 }

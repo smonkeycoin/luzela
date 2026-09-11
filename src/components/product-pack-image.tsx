@@ -1,4 +1,5 @@
 import Image from "next/image";
+import type { ReactNode } from "react";
 
 type ProductPackImageContext = "card" | "cart" | "checkout";
 
@@ -9,7 +10,7 @@ const opticalOffsets: Record<
   card: {
     1: { x: 78, y: 40 },
     2: { x: 81, y: 46 },
-    3: { x: 86, y: 47 },
+    3: { x: 42, y: 62 },
   },
   cart: {
     1: { x: 47, y: 26 },
@@ -76,10 +77,12 @@ function getOpticalOffset(unitsPerPack: number, context: ProductPackImageContext
 export function ProductPackImage({
   alt,
   context,
+  feature,
   unitsPerPack,
 }: {
   alt: string;
   context: ProductPackImageContext;
+  feature?: ReactNode;
   unitsPerPack: number;
 }) {
   const displayCount = Math.max(1, Math.min(unitsPerPack, 3));
@@ -91,6 +94,7 @@ export function ProductPackImage({
       className={`relative grid place-items-center overflow-hidden border bg-white ${contextClasses[context]} ${getStageTone(displayCount, context)}`}
       data-pack-image={`${context}-${unitsPerPack}x`}
     >
+      {feature}
       <div
         className={`relative ${getBottleHeight(displayCount, context)}`}
         style={{ width: `${getStackWidth(displayCount, context)}px` }}

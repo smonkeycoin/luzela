@@ -24,8 +24,10 @@ function getAuthRedirectOrigin() {
 
 export function GoogleLoginButton({
   destination = "admin",
+  label,
 }: {
   destination?: "admin" | "collab";
+  label?: string;
 }) {
   const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const [error, setError] = useState<string | null>(null);
@@ -41,6 +43,7 @@ export function GoogleLoginButton({
       provider: "google",
       options: {
         redirectTo: `${getAuthRedirectOrigin()}/auth/callback`,
+        queryParams: destination === "collab" ? { prompt: "select_account" } : undefined,
       },
     });
 
@@ -59,7 +62,7 @@ export function GoogleLoginButton({
         className="focus-ring inline-flex h-12 items-center justify-center gap-2 rounded-[8px] bg-[var(--ink)] px-5 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:opacity-60"
       >
         <LogIn size={18} aria-hidden />
-        {loading ? "Conectando..." : "Continuar con Google"}
+        {loading ? "Conectando..." : label || "Continuar con Google"}
       </button>
       {error ? (
         <p className="text-sm font-semibold text-[var(--coral)]">{error}</p>

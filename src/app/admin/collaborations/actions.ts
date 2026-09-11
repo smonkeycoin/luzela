@@ -117,7 +117,7 @@ export async function sendInvitation(form: FormData) {
   const html = renderEmailLayout({
     preview: `Tu acceso a ${brand}`,
     title: brand,
-    body: `<p>Hola ${escapeHtml(member.display_name)},</p><p>Ya puedes consultar el desempeño de ${escapeHtml(brand)}.</p><p>Entra con la cuenta de Google asociada a este correo.</p><p style="margin:30px 0"><a href="${url}" style="background:#173f3a;color:white;padding:16px 24px;text-decoration:none">VER MI PANEL</a></p>`,
+    body: `<p>Hola,</p><p>Ya puedes consultar el desempeño de ${escapeHtml(brand)}.</p><p>Entra utilizando la cuenta de Google asociada a este correo:</p><p style="font-weight:700">${escapeHtml(member.email)}</p><p style="margin:30px 0"><a href="${url}" style="background:#173f3a;color:white;padding:16px 24px;text-decoration:none;font-weight:700">ENTRAR A MI PANEL</a></p>`,
   });
   const eventKey = `collab_invitation:${member.id}:${Math.floor(Date.now() / 60000)}`;
   const { data: event, error: eventError } = await db
@@ -145,7 +145,7 @@ export async function sendInvitation(form: FormData) {
         to: member.email,
         subject: `Tu acceso a ${brand}`,
         html,
-        text: `Hola ${member.display_name},\nYa puedes consultar el desempeño de ${brand}.\nEntra con la cuenta de Google asociada a este correo.\nVER MI PANEL: ${url}`,
+        text: `Hola,\n\nYa puedes consultar el desempeño de ${brand}.\n\nEntra utilizando la cuenta de Google asociada a este correo:\n${member.email}\n\nENTRAR A MI PANEL: ${url}`,
         replyTo: settings.replyTo || undefined,
       },
       { idempotencyKey: eventKey },
