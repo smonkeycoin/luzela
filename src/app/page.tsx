@@ -6,7 +6,6 @@ import { ArrowRight, Star } from "lucide-react";
 import { PublicFooter } from "@/components/public-footer";
 import { PublicHeader } from "@/components/public-header";
 import { ShopSection } from "@/components/shop-section";
-import { MetaPixelEvent } from "@/components/meta-pixel";
 import { TravelingBottle } from "@/components/traveling-bottle";
 import { getActiveProducts } from "@/lib/catalog/get-active-products";
 import { getFeatureFlags } from "@/lib/settings";
@@ -43,7 +42,6 @@ export default async function Home() {
 
   return (
     <main className="min-h-screen">
-      <MetaPixelEvent event="ViewContent" />
       <PublicHeader />
       <TravelingBottle />
 

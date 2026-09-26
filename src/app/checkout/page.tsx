@@ -5,12 +5,12 @@ import { ArrowLeft, ChevronDown, MapPin, Mail, Phone, ShieldCheck, Truck } from 
 
 import { CheckoutForm } from "@/components/checkout-form";
 import { CheckoutSubmitButton } from "@/components/checkout-submit-button";
+import { FunnelCheckoutStart } from "@/components/funnel-checkout-start";
 import { AttributionCheckoutField } from "@/components/attribution-checkout-field";
 import { PaymentLogos } from "@/components/payment-logos";
 import { ProductPackImage } from "@/components/product-pack-image";
 import { PublicFooter } from "@/components/public-footer";
 import { PublicHeader } from "@/components/public-header";
-import { MetaPixelEvent } from "@/components/meta-pixel";
 import { TrustBar } from "@/components/trust-bar";
 import { getCheckoutProduct } from "@/lib/catalog/get-checkout-product";
 import type { CatalogProduct } from "@/lib/catalog/types";
@@ -139,13 +139,7 @@ export default async function CheckoutPage({
 
   return (
     <main className="min-h-screen bg-[#f7f6f1]">
-      <MetaPixelEvent
-        event="InitiateCheckout"
-        params={{
-          currency: product?.variant.currency.toUpperCase() || "MXN",
-          value: product ? (product.variant.effective_price_cents * quantity) / 100 : 0,
-        }}
-      />
+      {product && available ? <FunnelCheckoutStart sku={product.variant.sku} productId={product.id} quantity={quantity} valueCents={product.variant.effective_price_cents * quantity} /> : null}
       <PublicHeader />
       <div className="mx-auto max-w-6xl px-4 py-5 sm:px-6">
         <Link

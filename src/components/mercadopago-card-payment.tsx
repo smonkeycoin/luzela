@@ -1,6 +1,7 @@
 "use client";
 
 import { CardPayment, initMercadoPago } from "@mercadopago/sdk-react";
+import { useRouter } from "next/navigation";
 import { ShieldCheck } from "lucide-react";
 import {
   useCallback,
@@ -10,6 +11,7 @@ import {
   useState,
   type ComponentProps,
 } from "react";
+import { trackCommerce } from "@/lib/analytics/client";
 
 type BrickStatus = "loading" | "ready" | "error";
 type CardPaymentProps = ComponentProps<typeof CardPayment>;
@@ -73,6 +75,7 @@ export function MercadoPagoCardPayment({
   email: string;
   publicKey: string;
 }) {
+  const router = useRouter();
   const [status, setStatus] = useState<BrickStatus>("loading");
   const [message, setMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -117,6 +120,7 @@ export function MercadoPagoCardPayment({
       if (hasSecureFrames && !hasSkeleton) {
         setStatus("ready");
         setMessage(null);
+        trackCommerce("payment_page_viewed", {}, `payment_page_viewed:${checkoutSessionId}`);
       }
     }
 
@@ -129,7 +133,7 @@ export function MercadoPagoCardPayment({
       window.clearTimeout(initialCheck);
       observer.disconnect();
     };
-  }, [publicKey, status, validAmount]);
+  }, [checkoutSessionId, publicKey, status, validAmount]);
 
   useEffect(() => {
     if (!validAmount || status === "error") {
@@ -201,7 +205,8 @@ export function MercadoPagoCardPayment({
   const handleReady = useCallback(() => {
     setStatus("ready");
     setMessage(null);
-  }, []);
+    trackCommerce("payment_page_viewed", {}, `payment_page_viewed:${checkoutSessionId}`);
+  }, [checkoutSessionId]);
 
   const handleError = useCallback((error: BrickError) => {
     const sanitized = reportMercadoPagoIssue("brick-render", error);
@@ -226,6 +231,7 @@ export function MercadoPagoCardPayment({
         submittingRef.current = true;
         setSubmitting(true);
         setMessage("Procesando pago...");
+        trackCommerce("payment_submitted", {});
 
         fetch("/api/mercadopago/order", {
           method: "POST",
@@ -252,7 +258,7 @@ export function MercadoPagoCardPayment({
             }
 
             setMessage("Pago recibido. Confirmaremos tu orden por webhook seguro.");
-            window.location.assign(body.next_url || "/checkout/success");
+            router.push(`${body.next_url || "/checkout/success"}?checkout_session=${encodeURIComponent(checkoutSessionId)}`);
             resolve();
           })
           .catch((error) => {
@@ -265,7 +271,7 @@ export function MercadoPagoCardPayment({
             reject(error);
           });
       }),
-    [checkoutSessionId],
+    [checkoutSessionId, router],
   );
 
   if (!publicKey) {

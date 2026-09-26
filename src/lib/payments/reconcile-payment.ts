@@ -1,6 +1,7 @@
 import { getMercadoPagoOrder, type MercadoPagoOrder } from "@/lib/mercadopago/client";
 import { confirmProviderPaidOrder } from "@/lib/payments/confirm-paid-order";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { orderEventContext, recordCommerceEvent } from "@/lib/analytics/commerce";
 
 type PaymentRow = {
   id: string;
@@ -205,6 +206,21 @@ export async function reconcileMercadoPagoPayment({
       })
       .eq("order_id", order.id),
   ]);
+
+  if (paid || ["failed", "rejected", "cancelled"].includes(providerOrder.status || "")) {
+    try {
+      const context = await orderEventContext(order.id);
+      const accepted = providerOrder.status === "processed" && paid;
+      await recordCommerceEvent({
+        event_name: accepted ? "payment_provider_accepted" : "payment_provider_rejected",
+        event_key: `provider_result:${order.id}:${accepted ? "accepted" : "rejected"}`,
+        order_id: order.id, checkout_session_id: context.checkout_session_id,
+        anonymous_session_id: context.anonymous_session_id, is_qa: context.is_qa,
+        ...context.attribution,
+        metadata: { category: accepted ? "accepted" : String(providerOrder.status || "rejected").slice(0, 60) },
+      });
+    } catch { console.warn("commerce_analytics_write_failed", { event: "payment_provider_result" }); }
+  }
 
   if (paid) {
     await confirmProviderPaidOrder({

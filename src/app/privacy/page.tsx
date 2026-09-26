@@ -1,4 +1,5 @@
 import { InfoPage } from "@/components/info-page";
+import { MarketingConsent } from "@/components/marketing-consent";
 
 export default function PrivacyPage() {
   return (
@@ -10,6 +11,7 @@ export default function PrivacyPage() {
           privacidad final antes de producción.
         </p>
         {/* TODO: Replace with Luzela-approved privacy policy. */}
+        <MarketingConsent />
       </section>
     </InfoPage>
   );

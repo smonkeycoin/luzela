@@ -5,6 +5,8 @@ const mocks = vi.hoisted(() => ({
   sendAdminOrderAlertEmail: vi.fn(),
   sendOrderConfirmedEmail: vi.fn(),
   syncCustomerPaidOrderStats: vi.fn(),
+  recordCommerceEvent: vi.fn(),
+  orderEventContext: vi.fn(),
 }));
 
 vi.mock("@/lib/supabase/admin", () => ({
@@ -23,11 +25,15 @@ vi.mock("@/lib/customers/sync-customer-stats", () => ({
   syncCustomerPaidOrderStats: mocks.syncCustomerPaidOrderStats,
 }));
 
+vi.mock("@/lib/analytics/commerce", () => ({
+  recordCommerceEvent: mocks.recordCommerceEvent,
+  orderEventContext: mocks.orderEventContext,
+}));
+
 import { confirmProviderPaidOrder } from "./confirm-paid-order";
 
 function createSupabaseMock({ beforePaymentStatus = "requires_payment" } = {}) {
   const inserts: Array<{ table: string; values: Record<string, unknown> }> = [];
-  let orderSelectCount = 0;
 
   return {
     inserts,
@@ -36,12 +42,18 @@ function createSupabaseMock({ beforePaymentStatus = "requires_payment" } = {}) {
       from(table: string) {
         if (table === "orders") {
           return {
-            select: vi.fn(() => ({
+            select: vi.fn((fields: string) => ({
               eq: vi.fn(() => ({
                 single: vi.fn(async () => {
-                  orderSelectCount += 1;
-
-                  if (orderSelectCount === 1) {
+                  if (fields.includes("subtotal_cents")) {
+                    return { data: {
+                      id: "order-1", payment_status: "paid", subtotal_cents: 81900,
+                      discount_cents: 8190, shipping_cents: 0, total_cents: 73710,
+                      currency: "mxn", discount_code: "CHAVOLIN10", metadata: {},
+                      order_items: [{ product_id: "product-1", sku: "LUZ-SUMMER-3X", quantity: 1, units_per_pack: 3, subtotal_cents: 81900 }],
+                    }, error: null };
+                  }
+                  if (fields === "payment_status") {
                     return {
                       data: { payment_status: beforePaymentStatus },
                       error: null,
@@ -93,6 +105,11 @@ describe("confirmProviderPaidOrder", () => {
       failed: 0,
       skipped: 0,
       results: [{ eventId: "admin-email-event-1" }, { eventId: "admin-email-event-2" }],
+    });
+    mocks.recordCommerceEvent.mockResolvedValue(undefined);
+    mocks.orderEventContext.mockResolvedValue({
+      anonymous_session_id: "session-1", checkout_session_id: "checkout-1",
+      is_qa: false, attribution: {},
     });
   });
 
@@ -151,5 +168,36 @@ describe("confirmProviderPaidOrder", () => {
       "order_confirmation_email_sent",
       "admin_order_alert_failed",
     ]);
+  });
+
+  it("uses the same purchase key for repeated paid reconciliation and webhook delivery", async () => {
+    const supabase = createSupabaseMock({ beforePaymentStatus: "paid" });
+    mocks.createSupabaseAdminClient.mockReturnValue(supabase.client);
+    const input = { orderId: "order-1", checkoutSessionId: null, paymentIntentId: null, paymentEventId: "payment-event-1" };
+
+    await confirmProviderPaidOrder(input);
+    await confirmProviderPaidOrder(input);
+
+    expect(mocks.recordCommerceEvent).toHaveBeenCalledTimes(2);
+    expect(mocks.recordCommerceEvent.mock.calls.map(([event]) => event.event_key)).toEqual([
+      "purchase:order-1", "purchase:order-1",
+    ]);
+    expect(mocks.sendOrderConfirmedEmail).not.toHaveBeenCalled();
+  });
+
+  it("continues paid reconciliation when the analytics write fails", async () => {
+    const supabase = createSupabaseMock();
+    mocks.createSupabaseAdminClient.mockReturnValue(supabase.client);
+    mocks.recordCommerceEvent.mockRejectedValueOnce(new Error("analytics_unavailable"));
+    const warning = vi.spyOn(console, "warn").mockImplementation(() => {});
+
+    await expect(confirmProviderPaidOrder({
+      orderId: "order-1", checkoutSessionId: null, paymentIntentId: null,
+      paymentEventId: "payment-event-1",
+    })).resolves.toBeUndefined();
+
+    expect(mocks.sendOrderConfirmedEmail).toHaveBeenCalledWith({ orderId: "order-1" });
+    expect(warning).toHaveBeenCalledWith("commerce_analytics_write_failed", { event: "purchase" });
+    warning.mockRestore();
   });
 });

@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Leaf, MapPin, ShieldCheck, Truck } from "lucide-react";
 
 import type { CatalogProduct } from "@/lib/catalog/types";
@@ -10,6 +10,8 @@ import { formatMoney } from "@/lib/money";
 import { AddToCartButton } from "./add-to-cart-button";
 import { ProductPackImage } from "./product-pack-image";
 import { ChavolinesPackFeature } from "./chavolines-pack-feature";
+import { FunnelProductView } from "./funnel-product-view";
+import { trackCommerce } from "@/lib/analytics/client";
 
 function isDuo(product: CatalogProduct) {
   return /d[uú]o/i.test(`${product.name} ${product.variant.name}`);
@@ -51,6 +53,18 @@ const summerTrustFacts = [
 ];
 
 export function ShopSection({ products, error }: { products: CatalogProduct[]; error?: string }) {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const node = sectionRef.current;
+    if (!node) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting && entry.intersectionRatio >= 0.5) timer = setTimeout(() => trackCommerce("view_shop", {}, "view_shop"), 1000);
+      else clearTimeout(timer);
+    }, { threshold: [0, 0.5, 1] });
+    observer.observe(node);
+    return () => { clearTimeout(timer); observer.disconnect(); };
+  }, []);
   const summerMode = products.some(isSummer);
   const [category, setCategory] = useState("Todos");
   const sorted = useMemo(() => [...products].sort((a, b) => {
@@ -84,7 +98,7 @@ export function ShopSection({ products, error }: { products: CatalogProduct[]; e
       data-travel-products
       className="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:py-24"
     >
-      <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div ref={sectionRef} className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--teal)]">
             Tienda
@@ -151,10 +165,12 @@ export function ShopSection({ products, error }: { products: CatalogProduct[]; e
               const hasOffer = product.variant.offer_active && product.variant.offer_price_cents;
 
               return (
-                <article
+                <FunnelProductView
                   key={product.id}
-                  data-summer-pack={summer ? `${product.variant.units_per_pack}x` : undefined}
-                  data-travel-duo={featured ? "true" : undefined}
+                  productId={product.id}
+                  sku={product.variant.sku}
+                  summerPack={summer ? `${product.variant.units_per_pack}x` : undefined}
+                  featured={featured}
                   className={`grid w-full min-w-0 max-w-full border ${
                     summer
                       ? `${orderClass} ${getSummerCardClasses(product.variant.units_per_pack)} grid-rows-[auto_1fr] gap-5`
@@ -264,7 +280,7 @@ export function ShopSection({ products, error }: { products: CatalogProduct[]; e
                       <AddToCartButton product={product} featured={featured} />
                     </div>
                   </div>
-                </article>
+                </FunnelProductView>
               );
             })}
           </div>

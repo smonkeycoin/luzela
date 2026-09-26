@@ -26,8 +26,8 @@ export default async function Page({
         .eq("collaborator_id", collab.id).eq("status", "active").is("deleted_at", null)
     : { data: [] };
   const coupon = coupons?.[0];
-  const campaignUrl = "https://www.luzela.mx/?ref=chavolines";
-  const utmUrl = `${campaignUrl}&utm_source=elmundoenpareja&utm_medium=creator&utm_campaign=chavolin`;
+  const campaignUrl = "https://www.luzela.mx/chavolines?utm_source=instagram&utm_medium=creator&utm_campaign=luzela_x_chavolines";
+  const utmUrl = `${campaignUrl}&utm_content=story_01`;
   return (
     <main className="min-h-screen bg-[#f7f6f1] px-5 py-8 sm:px-8">
       <div className="mx-auto max-w-7xl">

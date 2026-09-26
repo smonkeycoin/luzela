@@ -1,10 +1,12 @@
 "use client";
 
 import Link from "next/link";
+import { useEffect } from "react";
 import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 
 import type { CatalogProduct } from "@/lib/catalog/types";
 import { formatMoney } from "@/lib/money";
+import { trackCommerce } from "@/lib/analytics/client";
 
 import { CartPromoSummary } from "./cart-promo-summary";
 import { PaymentLogos } from "./payment-logos";
@@ -36,6 +38,13 @@ export function CartView({
   );
   const firstItem = hydratedItems[0];
   const canQuoteCart = hydratedItems.length === 1 && firstItem.product.free_shipping;
+
+  useEffect(() => {
+    if (hydratedItems.length > 0) trackCommerce("view_cart", {
+      value_cents: subtotalCents,
+      metadata: { item_count: hydratedItems.reduce((sum, item) => sum + item.quantity, 0) },
+    }, "view_cart");
+  }, [hydratedItems, subtotalCents]);
 
   if (!ready) {
     return (

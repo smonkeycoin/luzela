@@ -63,6 +63,7 @@ export default async function AdminAnalyticsPage({
             Analytics
           </p>
           <h1 className="mt-2 text-3xl font-semibold">Analytics</h1>
+          <Link href="/admin/analytics/funnel" className="mt-3 inline-block text-sm font-semibold text-[var(--teal)] underline">Ver funnel</Link>
           <p className="mt-2 text-sm text-[var(--muted)]">
             Entiende cómo está vendiendo Luzela.
           </p>

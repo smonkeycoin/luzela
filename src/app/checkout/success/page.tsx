@@ -3,10 +3,13 @@ import { ShieldCheck } from "lucide-react";
 
 import { PublicFooter } from "@/components/public-footer";
 import { PublicHeader } from "@/components/public-header";
+import { MetaPaidPurchase } from "@/components/meta-paid-purchase";
 
-export default function CheckoutSuccessPage() {
+export default async function CheckoutSuccessPage({ searchParams }: { searchParams: Promise<{ checkout_session?: string }> }) {
+  const { checkout_session: sessionId } = await searchParams;
   return (
     <main className="min-h-screen">
+      <MetaPaidPurchase checkoutSessionId={sessionId && /^[0-9a-f-]{36}$/i.test(sessionId) ? sessionId : null} />
       <PublicHeader />
       <div className="grid min-h-[70vh] place-items-center px-4 py-12">
         <section className="surface max-w-xl rounded-[8px] p-8 text-center">

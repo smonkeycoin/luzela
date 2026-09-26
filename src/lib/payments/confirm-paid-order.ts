@@ -2,6 +2,7 @@ import { sendAdminOrderAlertEmail } from "@/lib/email/send-admin-order-alert";
 import { sendOrderConfirmedEmail } from "@/lib/email/send-order-confirmed";
 import { syncCustomerPaidOrderStats } from "@/lib/customers/sync-customer-stats";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { orderEventContext, recordCommerceEvent } from "@/lib/analytics/commerce";
 
 export async function confirmProviderPaidOrder({
   checkoutSessionId,
@@ -32,6 +33,43 @@ export async function confirmProviderPaidOrder({
   if (error) {
     throw error;
   }
+
+  try {
+    const [{ data: paidOrder }, context] = await Promise.all([
+      supabase.from("orders")
+        .select("id, payment_status, subtotal_cents, discount_cents, shipping_cents, total_cents, currency, discount_code, metadata, order_items(product_id, sku, quantity, units_per_pack, subtotal_cents)")
+        .eq("id", orderId).single(),
+      orderEventContext(orderId),
+    ]);
+    if (paidOrder?.payment_status === "paid") {
+      const items = (paidOrder.order_items || []).map((item) => ({
+        sku: item.sku, quantity: item.quantity,
+        units: item.quantity * item.units_per_pack,
+        net_merchandise_cents: item.subtotal_cents,
+      }));
+      const first = paidOrder.order_items?.[0];
+      const orderMetadata = paidOrder.metadata && typeof paidOrder.metadata === "object" ? paidOrder.metadata as Record<string, unknown> : {};
+      await recordCommerceEvent({
+        event_name: "purchase", event_key: `purchase:${orderId}`, order_id: orderId,
+        checkout_session_id: context.checkout_session_id, anonymous_session_id: context.anonymous_session_id,
+        is_qa: context.is_qa, ...context.attribution,
+        product_id: first?.product_id || null, product_sku: first?.sku || null,
+        quantity: items.reduce((n, item) => n + item.quantity, 0),
+        value_cents: Math.max(0, paidOrder.subtotal_cents - paidOrder.discount_cents),
+        currency: paidOrder.currency,
+        metadata: {
+          gross_merchandise_cents: paidOrder.subtotal_cents,
+          discount_amount_cents: paidOrder.discount_cents,
+          net_merchandise_cents: Math.max(0, paidOrder.subtotal_cents - paidOrder.discount_cents),
+          shipping_collected_cents: paidOrder.shipping_cents,
+          total_collected_cents: paidOrder.total_cents,
+          coupon: paidOrder.discount_code || null,
+          attribution_reason: typeof orderMetadata.collab_attribution_reason === "string" ? orderMetadata.collab_attribution_reason.slice(0, 40) : null,
+          items,
+        },
+      });
+    }
+  } catch { console.warn("commerce_analytics_write_failed", { event: "purchase" }); }
 
   await supabase
     .from("payment_events")

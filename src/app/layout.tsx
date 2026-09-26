@@ -3,7 +3,10 @@ import type { Viewport } from "next";
 import type { ReactNode } from "react";
 import { Montserrat } from "next/font/google";
 import { AttributionCapture } from "@/components/attribution-capture";
+import { FunnelRouteTracker } from "@/components/funnel-route-tracker";
 import { MetaPixel } from "@/components/meta-pixel";
+import { Analytics } from "@vercel/analytics/next";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 
 const montserrat = Montserrat({
@@ -63,8 +66,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="es-MX" className={`${montserrat.variable} h-full antialiased`}>
       <body className="min-h-full bg-[var(--background)] text-[var(--foreground)]">
         <AttributionCapture />
+        <FunnelRouteTracker />
         <MetaPixel />
         {children}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );
