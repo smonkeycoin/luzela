@@ -9,7 +9,7 @@ import { trackCommerce } from "@/lib/analytics/client";
 export function AddToCartButton({ product, featured = false }: { product: CatalogProduct; featured?: boolean }) {
   const available = product.variant.stock_on_hand > 0;
   const label = product.variant.sku === "LUZ-SUMMER-3X"
-    ? "Comprar Summer Drop"
+    ? "COMPRAR SUMMER DROP"
     : product.variant.analytics_item_id === "luzela_pack_10"
     ? "Comprar pack"
     : product.variant.analytics_item_id.startsWith("summer_")

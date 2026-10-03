@@ -63,7 +63,7 @@ export default async function Home() {
               {summerDropActive ? "SUMMER DROP" : "SUMMER LUZELA"}
             </p>
             <h1 className="mt-5 max-w-4xl text-5xl font-semibold leading-[1.02] text-[var(--ink)] sm:text-7xl">
-              {summerDropActive ? "PAGA 2. RECIBE 3." : "Más Luzela. Más días bajo el sol."}
+              {summerDropActive ? <><span className="block">PAGA 2.</span><span className="block">RECIBE 3.</span></> : "Más Luzela. Más días bajo el sol."}
             </h1>
             <p className="mt-6 max-w-xl text-base leading-8 text-[var(--muted)] sm:text-lg">
               {summerDropActive
@@ -75,7 +75,7 @@ export default async function Home() {
                 href={summerDropActive ? "/summer-drop" : "/#tienda"}
                 className="focus-ring inline-flex h-12 items-center justify-center gap-2 bg-[var(--ink)] px-5 text-sm font-semibold text-white transition hover:bg-black"
               >
-                {summerDropActive ? "Comprar Summer Drop" : "Ver productos"}
+                {summerDropActive ? "COMPRAR SUMMER DROP" : "Ver productos"}
                 <ArrowRight size={18} aria-hidden />
               </Link>
               <Link
