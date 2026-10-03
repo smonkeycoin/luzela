@@ -200,7 +200,6 @@ function deriveTouch({ url, referrer, now = new Date() }: CaptureInput, seenAt: 
       campaign,
       content,
       term,
-      ref: referral || undefined,
       referrer: safeReferrer,
       landingPath,
       landingUrl,
