@@ -51,6 +51,23 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "checkout_session_not_found" }, { status: 404 });
   }
 
+  const { data: orderCampaign } = await supabase.from("orders")
+    .select("metadata")
+    .eq("id", checkoutSession.order_id)
+    .maybeSingle();
+  const orderMetadata = orderCampaign?.metadata && typeof orderCampaign.metadata === "object"
+    ? orderCampaign.metadata as Record<string, unknown>
+    : {};
+  if (orderMetadata.campaign === "summer_drop") {
+    const { data: claim } = await supabase.from("summer_drop_allocation_claims")
+      .select("status, expires_at")
+      .eq("order_id", checkoutSession.order_id)
+      .maybeSingle();
+    if (claim?.status !== "reserved" || !claim.expires_at || new Date(claim.expires_at).getTime() <= Date.now()) {
+      return NextResponse.json({ error: "summer_drop_allocation_expired" }, { status: 409 });
+    }
+  }
+
   const { data: payment } = await supabase
     .from("payments")
     .select("id, amount_cents, currency, provider_order_id, status, idempotency_key")

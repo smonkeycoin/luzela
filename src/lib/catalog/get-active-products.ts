@@ -7,6 +7,7 @@ import type { CatalogProduct } from "./types";
 import { canShowProductInStorefront } from "./display";
 import { getAvailablePacks, getPrimaryBundleComponent } from "./pack";
 import { getDiscountCents, getEffectivePriceCents, getPricePerUnitCents } from "./pricing";
+import { applySummerDropPricing, getSummerDropAvailability, SUMMER_DROP } from "./summer-drop";
 
 type ProductRow = {
   id: string;
@@ -83,7 +84,10 @@ export async function getActiveProducts(): Promise<{
     return { products: [], error: error.message };
   }
 
-  const [settings] = await Promise.all([getAppSettings()]);
+  const [settings, summerDropAvailability] = await Promise.all([
+    getAppSettings(),
+    getSummerDropAvailability(supabase),
+  ]);
   const rows = (data || []) as ProductRow[];
   const componentVariantIds = rows
     .flatMap((product) => product.product_variants || [])
@@ -130,11 +134,16 @@ export async function getActiveProducts(): Promise<{
         ? lowStockThresholdByVariantId.get(component.variant_id)
         : getLowStockThreshold(variant.inventory);
       const availablePacks = getAvailablePacks(physicalStockOnHand, unitsPerPack);
+      const summerDropActive = summerDropAvailability?.active === true &&
+        summerDropAvailability.remaining_packs > 0;
+      const campaignLimitedPacks = summerDropActive && variant.sku === SUMMER_DROP.sku
+        ? Math.min(availablePacks, summerDropAvailability.remaining_packs)
+        : availablePacks;
       const effectivePriceCents = getEffectivePriceCents(variant);
       const attributes = product.attributes || {};
       const metadata = variant.metadata || {};
 
-      return {
+      return applySummerDropPricing({
         id: product.id,
         slug: product.slug,
         name: product.name,
@@ -157,10 +166,10 @@ export async function getActiveProducts(): Promise<{
           price_per_unit_cents: getPricePerUnitCents(effectivePriceCents, unitsPerPack),
           discount_cents: getDiscountCents(variant),
           currency: variant.currency,
-          stock_on_hand: availablePacks,
+          stock_on_hand: campaignLimitedPacks,
           physical_stock_on_hand: physicalStockOnHand,
           stock_label: getPublicStockLabel({
-            stock: availablePacks,
+            stock: campaignLimitedPacks,
             lowStockThreshold: lowStockThreshold ?? settings.low_stock_threshold,
             showExactStockPublicly: settings.show_exact_stock_publicly,
           }),
@@ -177,7 +186,7 @@ export async function getActiveProducts(): Promise<{
               ? attributes.secondary_headline
               : null,
         },
-      } satisfies CatalogProduct;
+      } satisfies CatalogProduct, summerDropActive);
     })
     .filter((product): product is CatalogProduct => product !== null);
 

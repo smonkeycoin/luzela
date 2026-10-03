@@ -9,9 +9,9 @@ import { formatMoney } from "@/lib/money";
 
 import { AddToCartButton } from "./add-to-cart-button";
 import { ProductPackImage } from "./product-pack-image";
-import { ChavolinesPackFeature } from "./chavolines-pack-feature";
 import { FunnelProductView } from "./funnel-product-view";
 import { trackCommerce } from "@/lib/analytics/client";
+import { isSummerDropProduct } from "@/lib/catalog/summer-drop";
 
 function isDuo(product: CatalogProduct) {
   return /d[uú]o/i.test(`${product.name} ${product.variant.name}`);
@@ -23,19 +23,14 @@ function isSummer(product: CatalogProduct) {
 
 function getSummerOrderClasses(unitsPerPack: number) {
   if (unitsPerPack === 3) {
-    return "order-1 lg:order-3";
+    return "order-1";
   }
-
-  if (unitsPerPack === 2) {
-    return "order-2 lg:order-2";
-  }
-
-  return "order-3 lg:order-1";
+  return "order-2";
 }
 
 function getSummerCardClasses(unitsPerPack: number) {
   if (unitsPerPack === 3) {
-    return "border-[var(--teal)] bg-white p-6 shadow-[0_18px_45px_rgba(20,123,117,0.12)]";
+    return "border-[var(--teal)] bg-[linear-gradient(145deg,#e8faf6_0%,#fffdf7_100%)] p-5 shadow-[0_18px_45px_rgba(20,123,117,0.16)] ring-1 ring-[var(--teal)]/20 sm:p-6";
   }
 
   if (unitsPerPack === 2) {
@@ -65,7 +60,7 @@ export function ShopSection({ products, error }: { products: CatalogProduct[]; e
     observer.observe(node);
     return () => { clearTimeout(timer); observer.disconnect(); };
   }, []);
-  const summerMode = products.some(isSummer);
+  const summerMode = products.some((product) => isSummerDropProduct(product));
   const [category, setCategory] = useState("Todos");
   const sorted = useMemo(() => [...products].sort((a, b) => {
     if (summerMode) {
@@ -89,8 +84,11 @@ export function ShopSection({ products, error }: { products: CatalogProduct[]; e
       ),
     [sorted],
   );
+  const campaignProducts = summerMode
+    ? sorted.filter((product) => product.variant.units_per_pack !== 2)
+    : sorted;
   const visibleProducts =
-    category === "Todos" ? sorted : sorted.filter((product) => product.category === category);
+    category === "Todos" ? campaignProducts : campaignProducts.filter((product) => product.category === category);
 
   return (
     <section
@@ -98,6 +96,7 @@ export function ShopSection({ products, error }: { products: CatalogProduct[]; e
       data-travel-products
       className="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:py-24"
     >
+      <span id="summer-drop" className="scroll-mt-20" aria-hidden="true" />
       <div ref={sectionRef} className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--teal)]">
@@ -130,7 +129,7 @@ export function ShopSection({ products, error }: { products: CatalogProduct[]; e
           <div
             className={
               summerMode
-                ? "grid gap-4 md:grid-cols-3 lg:items-stretch"
+                ? "grid gap-4 md:grid-cols-2 lg:items-stretch"
                 : "contents"
             }
           >
@@ -156,10 +155,11 @@ export function ShopSection({ products, error }: { products: CatalogProduct[]; e
               const available = product.variant.stock_on_hand > 0;
               const duo = isDuo(product);
               const summer = isSummer(product);
-              const featured = summer
+              const campaignCard = summerMode && summer;
+              const featured = campaignCard
                 ? product.variant.units_per_pack === 3
                 : duo;
-              const orderClass = summer
+              const orderClass = campaignCard
                 ? getSummerOrderClasses(product.variant.units_per_pack)
                 : "";
               const hasOffer = product.variant.offer_active && product.variant.offer_price_cents;
@@ -172,7 +172,7 @@ export function ShopSection({ products, error }: { products: CatalogProduct[]; e
                   summerPack={summer ? `${product.variant.units_per_pack}x` : undefined}
                   featured={featured}
                   className={`grid w-full min-w-0 max-w-full border ${
-                    summer
+                    campaignCard
                       ? `${orderClass} ${getSummerCardClasses(product.variant.units_per_pack)} grid-rows-[auto_1fr] gap-5`
                       : `border-[var(--line)] bg-[var(--paper)] p-5 sm:grid-cols-[180px_1fr] sm:p-6 ${duo ? "lg:grid-cols-[220px_1fr] lg:bg-white" : ""}`
                   }`}
@@ -182,11 +182,6 @@ export function ShopSection({ products, error }: { products: CatalogProduct[]; e
                       <ProductPackImage
                         alt={`${product.name} ${product.variant.units_per_pack}X`}
                         context="card"
-                        feature={
-                          product.slug === "summer-3x" ? (
-                            <ChavolinesPackFeature />
-                          ) : undefined
-                        }
                         unitsPerPack={product.variant.units_per_pack}
                       />
                     ) : (
@@ -209,7 +204,7 @@ export function ShopSection({ products, error }: { products: CatalogProduct[]; e
                   </div>
                   <div
                     className={
-                      summer
+                      campaignCard
                         ? "grid min-w-0 grid-rows-[36px_auto_24px_52px_minmax(84px,auto)_40px_1fr_auto] gap-3"
                         : "flex min-w-0 flex-col justify-between"
                     }
@@ -230,7 +225,9 @@ export function ShopSection({ products, error }: { products: CatalogProduct[]; e
                       </p>
                     </div>
                     <p className="text-lg font-semibold leading-6 text-[var(--ink)]">
-                      {product.variant.secondary_headline || "\u00a0"}
+                      {campaignCard && product.variant.units_per_pack === 3
+                        ? "PAGA 2. RECIBE 3."
+                        : product.variant.secondary_headline || "\u00a0"}
                     </p>
                     <div>
                       {hasOffer ? (
@@ -255,8 +252,10 @@ export function ShopSection({ products, error }: { products: CatalogProduct[]; e
                       </p>
                     </div>
                     <p className="text-sm leading-7 text-[var(--muted)]">
-                      {summer
-                        ? product.description
+                      {campaignCard && product.variant.units_per_pack === 3
+                        ? "3 Luzelas por $769. Envío incluido. Edición limitada, hasta agotar existencias."
+                        : summer
+                          ? product.description
                         : duo
                           ? "Dos Luzelas, más días para recordar."
                           : product.description || ""}

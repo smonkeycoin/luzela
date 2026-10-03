@@ -181,6 +181,7 @@ function createFakeSupabase(initial?: Partial<Record<string, DbRow[]>>) {
   return {
     db,
     client: {
+      rpc: vi.fn(async (_name: string, _args?: Record<string, unknown>) => ({ data: true as boolean, error: null as null })),
       from(table: string) {
         if (!db[table]) {
           db[table] = [];
@@ -525,4 +526,66 @@ describe("approved pricing and private attribution", () => {
       }
     }
   }
+});
+
+describe("Summer Drop checkout", () => {
+  it("keeps 3X gross at $819, applies $50, and sends $769 to Mercado Pago", async () => {
+    const fake = createFakeSupabase();
+    mocks.createSupabaseAdminClient.mockReturnValue(fake.client);
+    mocks.getCheckoutProduct.mockResolvedValue({ product: {
+      ...checkoutProduct.product,
+      id: "summer-3x-product",
+      slug: "summer-3x",
+      name: "SUMMER 3X",
+      variant: {
+        ...checkoutProduct.product.variant,
+        sku: "LUZ-SUMMER-3X",
+        name: "3 Luzelas",
+        price_cents: 81900,
+        offer_price_cents: 76900,
+        offer_active: true,
+        effective_price_cents: 76900,
+        discount_cents: 5000,
+        physical_stock_on_hand: 30,
+        stock_on_hand: 10,
+        units_per_pack: 3,
+      },
+    } });
+    mocks.getPaymentProvider.mockReturnValue("mercadopago");
+
+    const result = await createCheckoutSession(checkoutInput);
+
+    expect(result.ok).toBe(true);
+    expect(fake.db.orders[0]).toMatchObject({
+      subtotal_cents: 81900,
+      discount_cents: 5000,
+      shipping_cents: 0,
+      total_cents: 76900,
+      metadata: { campaign: "summer_drop", promotion: {
+        name: "SUMMER_DROP", gross_merchandise_cents: 81900,
+        discount_amount_cents: 5000, net_merchandise_cents: 76900,
+        physical_units: 3,
+      } },
+    });
+    expect(fake.db.order_items[0]).toMatchObject({ quantity: 1, units_per_pack: 3, physical_units: 3, subtotal_cents: 76900 });
+    expect(fake.db.payments[0].amount_cents).toBe(76900);
+    expect(fake.client.rpc).toHaveBeenCalledWith("claim_summer_drop_allocation", { p_order_id: "orders-1", p_packs: 1 });
+  });
+
+  it("does not start payment when the campaign allocation is already claimed", async () => {
+    const fake = createFakeSupabase();
+    fake.client.rpc.mockResolvedValueOnce({ data: false, error: null });
+    mocks.createSupabaseAdminClient.mockReturnValue(fake.client);
+    mocks.getCheckoutProduct.mockResolvedValue({ product: {
+      ...checkoutProduct.product,
+      slug: "summer-3x",
+      variant: { ...checkoutProduct.product.variant, sku: "LUZ-SUMMER-3X", units_per_pack: 3, price_cents: 81900, offer_price_cents: 76900, offer_active: true, effective_price_cents: 76900, stock_on_hand: 10, physical_stock_on_hand: 30 },
+    } });
+    mocks.getPaymentProvider.mockReturnValue("mercadopago");
+
+    const result = await createCheckoutSession(checkoutInput);
+
+    expect(result).toMatchObject({ ok: false, status: 409, error: "summer_drop_unavailable" });
+    expect(fake.db.payments).toHaveLength(0);
+  });
 });

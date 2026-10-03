@@ -207,6 +207,19 @@ export async function reconcileMercadoPagoPayment({
       .eq("order_id", order.id),
   ]);
 
+  if (!paid && ["failed", "rejected", "cancelled"].includes(providerOrder.status || "")) {
+    const { data: campaignOrder } = await supabase.from("orders")
+      .select("metadata")
+      .eq("id", order.id)
+      .maybeSingle();
+    const campaignMetadata = campaignOrder?.metadata && typeof campaignOrder.metadata === "object"
+      ? campaignOrder.metadata as Record<string, unknown>
+      : {};
+    if (campaignMetadata.campaign === "summer_drop") {
+      await supabase.from("orders").update({ payment_status: "failed" }).eq("id", order.id);
+    }
+  }
+
   if (paid || ["failed", "rejected", "cancelled"].includes(providerOrder.status || "")) {
     try {
       const context = await orderEventContext(order.id);

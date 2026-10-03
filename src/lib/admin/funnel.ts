@@ -51,6 +51,26 @@ export async function getFunnel(range: "today" | "7d" | "30d") {
     : { measurementStart, error: null, rows };
 }
 
+export async function getSummerDropPaidSummary() {
+  const db = createSupabaseAdminClient();
+  if (!db) return { paid_packs: 0, physical_units: 0, gross_cents: 0, discount_cents: 0, net_cents: 0, error: "Supabase no está configurado." };
+  const { data, error } = await db.from("orders")
+    .select("subtotal_cents, discount_cents, metadata, order_items(physical_units)")
+    .eq("payment_status", "paid")
+    .contains("metadata", { campaign: "summer_drop" });
+  if (error) return { paid_packs: 0, physical_units: 0, gross_cents: 0, discount_cents: 0, net_cents: 0, error: "No se pudieron cargar las órdenes Summer Drop." };
+  const rows = data || [];
+  const paid_packs = rows.reduce((total, row) => {
+    const metadata = row.metadata && typeof row.metadata === "object" ? row.metadata as Record<string, unknown> : {};
+    const promotion = metadata.promotion && typeof metadata.promotion === "object" ? metadata.promotion as Record<string, unknown> : {};
+    return total + Number(promotion.pack_quantity || 1);
+  }, 0);
+  const physical_units = rows.reduce((total, row) => total + (row.order_items || []).reduce((sum, item) => sum + Number(item.physical_units || 0), 0), 0);
+  const gross_cents = rows.reduce((total, row) => total + Number(row.subtotal_cents || 0), 0);
+  const discount_cents = rows.reduce((total, row) => total + Number(row.discount_cents || 0), 0);
+  return { paid_packs, physical_units, gross_cents, discount_cents, net_cents: gross_cents - discount_cents, error: null };
+}
+
 export function summarizeFunnel(rows: Row[]) {
   const distinct = (events: Row[], type: string) => new Set(events.filter((row) => row.event_name === type)
     .map((row) => row.anonymous_session_id || row.order_id).filter(Boolean)).size;
@@ -73,5 +93,17 @@ export function summarizeFunnel(rows: Row[]) {
         return n + items.reduce((total, item) => total + (Number(item.units) || 0), 0);
       }, 0), netCents: buys.reduce((n, row) => n + (row.value_cents || 0), 0) };
   });
-  return { steps, sources, products };
+  const campaignRows = rows.filter((row) => row.campaign === "summer_drop" || row.product_sku === "LUZ-SUMMER-3X");
+  const campaignCount = (name: string) => distinct(campaignRows, name);
+  const summerDrop = {
+    sessions: campaignCount("session_started"),
+    views: campaignCount("view_product"),
+    addToCart: campaignCount("add_to_cart"),
+    checkouts: campaignCount("checkout_created"),
+    paymentViews: campaignCount("payment_page_viewed"),
+    paymentSubmissions: campaignCount("payment_submitted"),
+    purchases: campaignCount("purchase"),
+    netCents: campaignRows.filter((row) => row.event_name === "purchase").reduce((n, row) => n + (row.value_cents || 0), 0),
+  };
+  return { steps, sources, products, summerDrop };
 }

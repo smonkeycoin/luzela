@@ -109,6 +109,7 @@ export default async function AdminOrderDetailPage({
     ? order?.order_items
     : [];
   const payments = Array.isArray(order?.payments) ? order?.payments : [];
+  const campaignPromotion = order?.metadata?.promotion as Record<string, unknown> | undefined;
   const shipments: Shipment[] = Array.isArray(order?.shipments)
     ? order?.shipments
     : [];
@@ -219,6 +220,22 @@ export default async function AdminOrderDetailPage({
                   ))}
                 </div>
               </article>
+
+              {campaignPromotion?.name === "SUMMER_DROP" ? (
+                <article className="surface rounded-[8px] p-5">
+                  <h2 className="text-lg font-semibold">SUMMER DROP</h2>
+                  <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-2">
+                    <div><dt className="text-[var(--muted)]">Campaign</dt><dd className="font-semibold">SUMMER DROP</dd></div>
+                    <div><dt className="text-[var(--muted)]">Packs pagados</dt><dd className="font-semibold">{Number(campaignPromotion.pack_quantity || 1)}</dd></div>
+                    <div><dt className="text-[var(--muted)]">Unidades físicas</dt><dd className="font-semibold">{Number(campaignPromotion.physical_units || 3)}</dd></div>
+                    <div><dt className="text-[var(--muted)]">Mercancía bruta</dt><dd className="font-semibold">{formatMoney(Number(campaignPromotion.gross_merchandise_cents || 0), order.currency)}</dd></div>
+                    <div><dt className="text-[var(--muted)]">Descuento</dt><dd className="font-semibold">−{formatMoney(Number(campaignPromotion.discount_amount_cents || 0), order.currency)}</dd></div>
+                    <div><dt className="text-[var(--muted)]">Mercancía neta</dt><dd className="font-semibold">{formatMoney(Number(campaignPromotion.net_merchandise_cents || 0), order.currency)}</dd></div>
+                    <div><dt className="text-[var(--muted)]">Envío cobrado</dt><dd className="font-semibold">{formatMoney(Number(campaignPromotion.shipping_collected_cents || 0), order.currency)}</dd></div>
+                    <div><dt className="text-[var(--muted)]">Total cobrado</dt><dd className="font-semibold">{formatMoney(Number(campaignPromotion.total_collected_cents || 0), order.currency)}</dd></div>
+                  </dl>
+                </article>
+              ) : null}
 
               <article className="surface rounded-[8px] p-5">
                 <h2 className="text-lg font-semibold">INVENTORY</h2>
@@ -543,6 +560,14 @@ export default async function AdminOrderDetailPage({
                 <h2 className="text-lg font-semibold">ADQUISICIÓN</h2>
                 {attribution ? (
                   <div className="mt-4 grid gap-4 text-sm">
+                    {order?.metadata?.collab_attribution ? (
+                      <div className="rounded-[8px] border border-[var(--line)] bg-[var(--background)] p-3">
+                        <p className="font-semibold">Referencia de colaboración · descuento no aplicado</p>
+                        <p className="mt-1 text-[var(--muted)]">
+                          {String(order.metadata.collab_attribution.display_name || "Chavolines")} · {String(order.metadata.collab_attribution.code || "CHAVOLIN10")}
+                        </p>
+                      </div>
+                    ) : null}
                     <AttributionBlock
                       title="Last touch"
                       source={attribution.last_touch_source}

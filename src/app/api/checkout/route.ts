@@ -83,7 +83,9 @@ export async function POST(request: Request) {
           product_id: item?.product_id || null, product_sku: item?.sku || null,
           quantity: item?.quantity || null, value_cents: item?.subtotal_cents || null,
           is_qa: isQa, ...safeOrderAttribution(attribution as Record<string, unknown> | null),
-          metadata: { coupon: order?.discount_code || null, attribution_reason: typeof orderMetadata.collab_attribution_reason === "string" ? orderMetadata.collab_attribution_reason.slice(0, 40) : null } });
+          ...(orderMetadata.campaign === "summer_drop" ? { campaign: "summer_drop", ref: "summerdrop" } : {}),
+          metadata: { coupon: order?.discount_code || null, attribution_reason: typeof orderMetadata.collab_attribution_reason === "string" ? orderMetadata.collab_attribution_reason.slice(0, 40) : null,
+            ...(orderMetadata.collab_attribution ? { collab_attribution: orderMetadata.collab_attribution } : {}) } });
       }
     }
   } catch { console.warn("commerce_analytics_write_failed", { event: "checkout_created" }); }

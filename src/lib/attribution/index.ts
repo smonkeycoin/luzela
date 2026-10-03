@@ -185,8 +185,10 @@ function deriveTouch({ url, referrer, now = new Date() }: CaptureInput, seenAt: 
   const landingUrl = sanitizeLandingUrl(parsedUrl);
   const utmSource = sanitizeLower(params.get("utm_source"));
   const utmMedium = sanitizeLower(params.get("utm_medium"));
-  const collab = params.get('ref')?.toLowerCase() === 'chavolines' || parsedUrl?.pathname === '/chavolines' || params.get('utm_campaign') === 'luzela_x_chavolines';
-  const campaign = sanitizeText(params.get("utm_campaign")) || (collab ? 'luzela_x_chavolines' : '');
+  const referral = sanitizeLower(params.get("ref"));
+  const collab = referral === 'chavolines' || parsedUrl?.pathname === '/chavolines' || params.get('utm_campaign') === 'luzela_x_chavolines';
+  const summerDrop = referral === "summerdrop" || params.get("utm_campaign") === "summer_drop";
+  const campaign = sanitizeText(params.get("utm_campaign")) || (collab ? 'luzela_x_chavolines' : summerDrop ? 'summer_drop' : '');
   const content = sanitizeText(params.get("utm_content"));
   const term = sanitizeText(params.get("utm_term"));
   const safeReferrer = sanitizeUrl(referrer || "");
@@ -198,6 +200,7 @@ function deriveTouch({ url, referrer, now = new Date() }: CaptureInput, seenAt: 
       campaign,
       content,
       term,
+      ref: referral || undefined,
       referrer: safeReferrer,
       landingPath,
       landingUrl,

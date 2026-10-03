@@ -7,6 +7,7 @@ import { Minus, Plus, ShoppingBag, Trash2 } from "lucide-react";
 import type { CatalogProduct } from "@/lib/catalog/types";
 import { formatMoney } from "@/lib/money";
 import { trackCommerce } from "@/lib/analytics/client";
+import { isSummerDropProduct, SUMMER_DROP } from "@/lib/catalog/summer-drop";
 
 import { CartPromoSummary } from "./cart-promo-summary";
 import { PaymentLogos } from "./payment-logos";
@@ -37,6 +38,7 @@ export function CartView({
     0,
   );
   const firstItem = hydratedItems[0];
+  const summerDrop = firstItem ? isSummerDropProduct(firstItem.product) : false;
   const canQuoteCart = hydratedItems.length === 1 && firstItem.product.free_shipping;
 
   useEffect(() => {
@@ -90,8 +92,8 @@ export function CartView({
               />
               <div className="grid gap-5">
                 <div>
-                  <h2 className="text-xl font-semibold text-[var(--ink)]">{product.name}</h2>
-                  <p className="mt-1 text-sm text-[var(--muted)]">{product.variant.name}</p>
+                  <h2 className="text-xl font-semibold text-[var(--ink)]">{summerDrop ? "SUMMER DROP" : product.name}</h2>
+                  <p className="mt-1 text-sm text-[var(--muted)]">{summerDrop ? "3 Luzelas · Paga 2. Recibe 3." : product.variant.name}</p>
                   {product.variant.units_per_pack >= 10 ? (
                     <p className="mt-1 text-sm font-semibold text-[var(--ink)]">
                       Incluye: {product.variant.units_per_pack} piezas
@@ -190,8 +192,18 @@ export function CartView({
             </dd>
           </div>
           {!canQuoteCart ? <>
+          {summerDrop ? <>
+            <div className="flex justify-between gap-4 border-b border-[var(--line)] pb-3">
+              <dt className="text-[var(--muted)]">Precio regular</dt>
+              <dd className="font-semibold">{formatMoney(SUMMER_DROP.regularPriceCents * firstItem.quantity, firstItem.product.variant.currency)}</dd>
+            </div>
+            <div className="flex justify-between gap-4 border-b border-[var(--line)] pb-3 text-[var(--teal)]">
+              <dt>Descuento Summer Drop</dt>
+              <dd>−{formatMoney(SUMMER_DROP.discountCents * firstItem.quantity, firstItem.product.variant.currency)}</dd>
+            </div>
+          </> : null}
           <div className="flex justify-between gap-4 border-b border-[var(--line)] pb-3">
-            <dt className="text-[var(--muted)]">Subtotal</dt>
+            <dt className="text-[var(--muted)]">Subtotal producto</dt>
             <dd className="font-semibold">{formatMoney(subtotalCents, firstItem.product.variant.currency)}</dd>
           </div>
           <div className="flex justify-between gap-4 border-b border-[var(--line)] pb-3">
@@ -210,16 +222,19 @@ export function CartView({
           </div>
           </> : null}
         </dl>
-        {canQuoteCart ? (
+        {canQuoteCart && !summerDrop ? (
           <CartPromoSummary variant={firstItem.product.variant.id} quantity={firstItem.quantity}
             price={firstItem.product.variant.effective_price_cents} currency={firstItem.product.variant.currency} />
         ) : (
-        <Link
-          href={`/checkout?variant=${firstItem.product.variant.id}&quantity=${firstItem.quantity}`}
-          className="focus-ring mt-6 inline-flex h-12 w-full items-center justify-center bg-[var(--ink)] px-5 text-sm font-semibold text-white"
-        >
-          Continuar al checkout
-        </Link>
+          <>
+            {summerDrop ? <p className="mt-5 text-xs leading-5 text-[var(--muted)]">SUMMER DROP ya incluye una promoción especial y no acumula otros descuentos.</p> : null}
+            <Link
+              href={`/checkout?variant=${firstItem.product.variant.id}&quantity=${firstItem.quantity}`}
+              className="focus-ring mt-6 inline-flex h-12 w-full items-center justify-center bg-[var(--ink)] px-5 text-sm font-semibold text-white"
+            >
+              Continuar al checkout
+            </Link>
+          </>
         )}
         {hydratedItems.length > 1 ? (
           <p className="mt-3 text-xs leading-5 text-[var(--muted)]">

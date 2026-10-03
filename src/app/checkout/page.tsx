@@ -16,8 +16,21 @@ import { getCheckoutProduct } from "@/lib/catalog/get-checkout-product";
 import type { CatalogProduct } from "@/lib/catalog/types";
 import { formatMoney } from "@/lib/money";
 import { getShippingPolicy } from "@/lib/settings";
+import { isSummerDropProduct, SUMMER_DROP } from "@/lib/catalog/summer-drop";
 
 const checkoutSteps = ["Datos", "Entrega", "Resumen", "Pago", "Confirmación"];
+
+function CheckoutTotals({ product, quantity, shippingCents }: { product: CatalogProduct | null; quantity: number; shippingCents: number }) {
+  if (product && isSummerDropProduct(product)) {
+    return <>
+      <div className="flex justify-between gap-4 border-b border-[var(--line)] pb-3"><dt>Subtotal</dt><dd>{formatMoney(SUMMER_DROP.regularPriceCents * quantity, product.variant.currency)}</dd></div>
+      <div className="flex justify-between gap-4 border-b border-[var(--line)] pb-3 text-[var(--teal)]"><dt>Descuento SUMMER DROP</dt><dd>−{formatMoney(SUMMER_DROP.discountCents * quantity, product.variant.currency)}</dd></div>
+      <div className="flex justify-between gap-4 border-b border-[var(--line)] pb-3"><dt>Envío</dt><dd>{shippingCents ? formatMoney(shippingCents, product.variant.currency) : "Incluido"}</dd></div>
+      <div className="flex justify-between gap-4 border-y border-[var(--line)] py-3 font-semibold"><dt>Total</dt><dd>{formatMoney(SUMMER_DROP.priceCents * quantity + shippingCents, product.variant.currency)}</dd></div>
+    </>;
+  }
+  return <CheckoutPromoTotals unitPrice={product?.variant.effective_price_cents || 0} shipping={shippingCents} currency={product?.variant.currency || "mxn"} />;
+}
 
 function getFriendlyError(error?: string) {
   if (!error) {
@@ -84,7 +97,7 @@ function OrderSummary({
         </div>
       </div>
       <dl className="mt-5 grid gap-4 text-sm">
-        <CheckoutPromoTotals unitPrice={product?.variant.effective_price_cents || 0} shipping={shippingCents} currency={product?.variant.currency || 'mxn'} />
+        <CheckoutTotals product={product} quantity={quantity} shippingCents={shippingCents} />
         <div className="flex justify-between gap-4 border-b border-[var(--line)] pb-3">
           <dt className="flex items-center gap-2 text-[var(--muted)]">
             <ShieldCheck size={16} aria-hidden />
@@ -286,7 +299,11 @@ export default async function CheckoutPage({
                   <input className="focus-ring min-w-0 h-12 rounded-[8px] border border-[var(--line)] bg-white px-3 text-sm" name="postal_code" required disabled={!product || !available} />
                 </label>
               </div>
-              <CheckoutPromoField />
+              {product && isSummerDropProduct(product) ? (
+                <p className="rounded-[8px] border border-[var(--line)] bg-white p-4 text-sm leading-6 text-[var(--muted)]">
+                  SUMMER DROP ya incluye una promoción especial y no acumula otros descuentos.
+                </p>
+              ) : <CheckoutPromoField />}
               <CheckoutSubmitButton disabled={!product || !available} />
               <p className="text-xs leading-5 text-[var(--muted)]">
                 Pago seguro. Tus datos bancarios no son almacenados por Luzela.

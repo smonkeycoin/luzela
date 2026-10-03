@@ -14,6 +14,7 @@ import {
 } from "@/lib/attribution";
 
 import { createAttemptSignature, isSameAttemptSignature } from "./idempotency";
+import { isSummerDropProduct, SUMMER_DROP } from "@/lib/catalog/summer-drop";
 
 const checkoutInputSchema = z.object({
   email: z.email(),
@@ -100,6 +101,28 @@ export async function createCheckoutSession(input: CheckoutInput): Promise<Check
     };
   }
 
+  const summerDrop = isSummerDropProduct(product);
+  let summerDropReferral: Record<string, unknown> | null = null;
+  if (summerDrop && payload.coupon_code?.trim().toUpperCase() === "CHAVOLIN10") {
+    const { data: referral } = await supabase
+      .from("coupons")
+      .select("id, code, status, collaborator_id, collaborators(slug, campaign_code, brand_name, display_name, status)")
+      .eq("code", "CHAVOLIN10")
+      .maybeSingle();
+    const collaborator = Array.isArray(referral?.collaborators) ? referral.collaborators[0] : referral?.collaborators;
+    if (referral?.status === "active" && collaborator?.status === "active") {
+      summerDropReferral = {
+        code: "CHAVOLIN10",
+        collaborator_id: referral.collaborator_id,
+        slug: collaborator.slug,
+        campaign_code: collaborator.campaign_code,
+        brand_name: collaborator.brand_name,
+        display_name: collaborator.display_name,
+        discount_eligible: false,
+      };
+    }
+  }
+
   const physicalUnitsRequired =
     payload.quantity * product.variant.units_per_pack;
 
@@ -112,16 +135,25 @@ export async function createCheckoutSession(input: CheckoutInput): Promise<Check
     };
   }
 
+  if (summerDrop && product.variant.stock_on_hand < payload.quantity) {
+    return {
+      ok: false,
+      status: 409,
+      error: "summer_drop_unavailable",
+      detail: "La cantidad seleccionada supera los Summer Drops disponibles.",
+    };
+  }
+
   const shippingCents = await getShippingCents(product.free_shipping);
-  const effectivePriceCents = product.variant.effective_price_cents;
-  const subtotalCents = effectivePriceCents * payload.quantity;
-  const promoResult = payload.coupon_code ? await quotePromo(payload.coupon_code, product, payload.quantity, payload.email) : null;
+  const effectivePriceCents = summerDrop ? SUMMER_DROP.priceCents : product.variant.effective_price_cents;
+  const subtotalCents = (summerDrop ? SUMMER_DROP.regularPriceCents : effectivePriceCents) * payload.quantity;
+  const promoResult = payload.coupon_code && !summerDrop ? await quotePromo(payload.coupon_code, product, payload.quantity, payload.email) : null;
   if (promoResult && !promoResult.ok) return {ok:false,status:400,error:'invalid_promo',detail:promoResult.error};
   const appliedPromo = promoResult?.ok ? promoResult : null;
   // Referral/UTM remains analytics context; only a validated manual coupon assigns a collaborator.
   const collab = appliedPromo?.collab || null;
   const reason = collab ? "coupon" : null;
-  const discountCents = appliedPromo?.discountCents || 0;
+  const discountCents = appliedPromo?.discountCents || (summerDrop ? SUMMER_DROP.discountCents * payload.quantity : 0);
   const taxCents = 0;
   const totalCents = subtotalCents - discountCents + shippingCents + taxCents;
   const appUrl = getAppUrl();
@@ -238,6 +270,24 @@ export async function createCheckoutSession(input: CheckoutInput): Promise<Check
         effective_price_cents: effectivePriceCents,
         discount_cents: product.variant.discount_cents,
         attribution: attributionSnapshot,
+        ...(summerDrop ? {
+          campaign: SUMMER_DROP.campaign,
+          promotion: {
+            name: "SUMMER_DROP",
+            gross_merchandise_cents: subtotalCents,
+            discount_amount_cents: discountCents,
+            net_merchandise_cents: subtotalCents - discountCents,
+            shipping_collected_cents: 0,
+            total_collected_cents: totalCents,
+            pack_quantity: payload.quantity,
+            physical_units: physicalUnitsRequired,
+            ...(summerDropReferral ? { referral: summerDropReferral } : {}),
+          },
+          ...(summerDropReferral ? {
+            collab_attribution_reason: "coupon_referral_only",
+            collab_attribution: summerDropReferral,
+          } : {}),
+        } : {}),
       },
     })
     .select("id, order_number")
@@ -259,7 +309,7 @@ export async function createCheckoutSession(input: CheckoutInput): Promise<Check
     units_per_pack: product.variant.units_per_pack,
     physical_units: physicalUnitsRequired,
     unit_price_cents: effectivePriceCents,
-    subtotal_cents: subtotalCents,
+    subtotal_cents: effectivePriceCents * payload.quantity,
     metadata: {
       analytics_item_id: product.variant.analytics_item_id,
       pack_quantity: payload.quantity,
@@ -279,6 +329,34 @@ export async function createCheckoutSession(input: CheckoutInput): Promise<Check
     return dbError("order_item_create_failed", itemError.message);
   }
 
+  if (summerDrop) {
+    const { data: claimed, error: claimError } = await supabase.rpc("claim_summer_drop_allocation", {
+      p_order_id: order.id,
+      p_packs: payload.quantity,
+    });
+    if (claimError || claimed !== true) {
+      await supabase.from("orders").update({
+        status: "cancelled",
+        payment_status: "failed",
+        cancelled_at: new Date().toISOString(),
+      }).eq("id", order.id);
+      return {
+        ok: false,
+        status: 409,
+        error: "summer_drop_unavailable",
+        detail: "Summer Drop agotado por el momento. Elige otro pack disponible.",
+      };
+    }
+  }
+  const releaseSummerDropClaim = async () => {
+    if (!summerDrop) return;
+    await supabase.from("orders").update({
+      status: "cancelled",
+      payment_status: "failed",
+      cancelled_at: new Date().toISOString(),
+    }).eq("id", order.id);
+  };
+
   await persistOrderAttribution({
     attribution: attributionSnapshot,
     orderId: order.id,
@@ -295,6 +373,7 @@ export async function createCheckoutSession(input: CheckoutInput): Promise<Check
   });
 
   if (!paymentResult.ok) {
+    await releaseSummerDropClaim();
     return paymentResult.result;
   }
 
@@ -327,7 +406,8 @@ export async function createCheckoutSession(input: CheckoutInput): Promise<Check
       .select("id")
       .single();
 
-    if (checkoutError || !checkoutSession) {
+  if (checkoutError || !checkoutSession) {
+      await releaseSummerDropClaim();
       return dbError("checkout_session_create_failed", checkoutError?.message);
     }
 
@@ -337,6 +417,7 @@ export async function createCheckoutSession(input: CheckoutInput): Promise<Check
       .eq("id", checkoutReservation.id);
 
     if (checkoutUrlError) {
+      await releaseSummerDropClaim();
       return dbError("checkout_session_create_failed", checkoutUrlError.message);
     }
 
@@ -344,6 +425,7 @@ export async function createCheckoutSession(input: CheckoutInput): Promise<Check
   }
 
   if (!stripe) {
+    await releaseSummerDropClaim();
     return {
       ok: false,
       status: 501,
@@ -415,6 +497,7 @@ export async function createCheckoutSession(input: CheckoutInput): Promise<Check
   );
 
   if (!session.url) {
+    await releaseSummerDropClaim();
     return {
       ok: false,
       status: 502,

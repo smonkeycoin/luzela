@@ -53,6 +53,7 @@ export async function confirmProviderPaidOrder({
         event_name: "purchase", event_key: `purchase:${orderId}`, order_id: orderId,
         checkout_session_id: context.checkout_session_id, anonymous_session_id: context.anonymous_session_id,
         is_qa: context.is_qa, ...context.attribution,
+        ...(orderMetadata.campaign === "summer_drop" ? { campaign: "summer_drop", ref: "summerdrop" } : {}),
         product_id: first?.product_id || null, product_sku: first?.sku || null,
         quantity: items.reduce((n, item) => n + item.quantity, 0),
         value_cents: Math.max(0, paidOrder.subtotal_cents - paidOrder.discount_cents),
@@ -65,6 +66,7 @@ export async function confirmProviderPaidOrder({
           total_collected_cents: paidOrder.total_cents,
           coupon: paidOrder.discount_code || null,
           attribution_reason: typeof orderMetadata.collab_attribution_reason === "string" ? orderMetadata.collab_attribution_reason.slice(0, 40) : null,
+          ...(orderMetadata.collab_attribution ? { collab_attribution: orderMetadata.collab_attribution } : {}),
           items,
         },
       });

@@ -6,6 +6,7 @@ import {
 import { renderOrderConfirmationEmail } from "@/lib/email/templates/order-confirmation";
 import { getShippingPolicy } from "@/lib/settings";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
+import { SUMMER_DROP } from "@/lib/catalog/summer-drop";
 
 type OrderEmailInput = {
   orderId: string;
@@ -19,6 +20,7 @@ type OrderRow = {
   discount_cents?: number;
   discount_code?: string | null;
   discount_value?: number | null;
+  metadata?: Record<string, unknown> | null;
   subtotal_cents: number;
   shipping_cents: number;
   total_cents: number;
@@ -80,7 +82,7 @@ export async function sendOrderConfirmedEmail(
   const { data } = await supabase
     .from("orders")
     .select(
-      "id, order_number, created_at, subtotal_cents, discount_cents, discount_code, discount_value, shipping_cents, total_cents, currency, customer_id, customers(email, first_name), customer_addresses(full_name, line1, line2, neighborhood, city, state, postal_code, country), order_items(name, quantity, units_per_pack, physical_units, unit_price_cents, subtotal_cents)",
+      "id, order_number, created_at, subtotal_cents, discount_cents, discount_code, discount_value, shipping_cents, total_cents, currency, customer_id, metadata, customers(email, first_name), customer_addresses(full_name, line1, line2, neighborhood, city, state, postal_code, country), order_items(name, quantity, units_per_pack, physical_units, unit_price_cents, subtotal_cents)",
     )
     .eq("id", input.orderId)
     .maybeSingle();
@@ -97,15 +99,18 @@ export async function sendOrderConfirmedEmail(
     return { sent: false, skipped: true, reason: "recipient_missing" };
   }
 
+  const summerDropOrder = (order.metadata?.promotion as { name?: string } | undefined)?.name === "SUMMER_DROP";
   const items = (order.order_items || []).map((item) => ({
-    name: item.name,
+    name: summerDropOrder ? "SUMMER DROP · 3 Luzelas · Paga 2. Recibe 3." : item.name,
     quantity: Number(item.quantity || 0),
     unitsPerPack: Number(item.units_per_pack || 1),
     physicalUnits: Number(
       item.physical_units || Number(item.quantity || 0) * Number(item.units_per_pack || 1),
     ),
-    unitPriceCents: Number(item.unit_price_cents || 0),
-    subtotalCents: Number(item.subtotal_cents || 0),
+    unitPriceCents: summerDropOrder ? SUMMER_DROP.regularPriceCents : Number(item.unit_price_cents || 0),
+    subtotalCents: summerDropOrder
+      ? SUMMER_DROP.regularPriceCents * Number(item.quantity || 0)
+      : Number(item.subtotal_cents || 0),
   }));
   const shippingPolicy = await getShippingPolicy();
   const rendered = renderOrderConfirmationEmail({
@@ -116,6 +121,9 @@ export async function sendOrderConfirmedEmail(
     subtotalCents: Number(order.subtotal_cents || 0),
     discountCents: Number(order.discount_cents || 0),
     discountCode: order.discount_code,
+    discountLabel: (order.metadata?.promotion as { name?: string } | undefined)?.name === "SUMMER_DROP"
+      ? "Descuento SUMMER DROP"
+      : undefined,
     discountPercent: order.discount_value,
     shippingCents: Number(order.shipping_cents || 0),
     currency: order.currency,

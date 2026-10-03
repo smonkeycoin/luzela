@@ -7,6 +7,7 @@ import { canShowProductInStorefront } from "./display";
 import { getAvailablePacks, getPrimaryBundleComponent } from "./pack";
 import { formatMoney } from "@/lib/money";
 import { getDiscountCents, getEffectivePriceCents, getPricePerUnitCents } from "./pricing";
+import { applySummerDropPricing, getSummerDropAvailability, SUMMER_DROP } from "./summer-drop";
 
 type VariantRow = {
   id: string;
@@ -140,10 +141,18 @@ export async function getCheckoutProduct(variantId?: string): Promise<{
   const metadata = row.metadata || {};
   const effectivePriceCents = getEffectivePriceCents(row);
   const availablePacks = getAvailablePacks(physicalStockOnHand, unitsPerPack);
-  const settings = await getAppSettings();
+  const [settings, summerDropAvailability] = await Promise.all([
+    getAppSettings(),
+    getSummerDropAvailability(supabase),
+  ]);
+  const summerDropActive = summerDropAvailability?.active === true &&
+    summerDropAvailability.remaining_packs > 0;
+  const campaignLimitedPacks = summerDropActive && row.sku === SUMMER_DROP.sku
+    ? Math.min(availablePacks, summerDropAvailability.remaining_packs)
+    : availablePacks;
 
   return {
-    product: {
+    product: applySummerDropPricing({
       id: productRow.id,
       slug: productRow.slug,
       name: productRow.name,
@@ -166,10 +175,10 @@ export async function getCheckoutProduct(variantId?: string): Promise<{
         price_per_unit_cents: getPricePerUnitCents(effectivePriceCents, unitsPerPack),
         discount_cents: getDiscountCents(row),
         currency: row.currency,
-        stock_on_hand: availablePacks,
+        stock_on_hand: campaignLimitedPacks,
         physical_stock_on_hand: physicalStockOnHand,
         stock_label: getPublicStockLabel({
-          stock: availablePacks,
+          stock: campaignLimitedPacks,
           lowStockThreshold: getLowStockThreshold(row.inventory) ?? settings.low_stock_threshold,
           showExactStockPublicly: settings.show_exact_stock_publicly,
         }),
@@ -185,6 +194,6 @@ export async function getCheckoutProduct(variantId?: string): Promise<{
             ? attributes.secondary_headline
             : null,
       },
-    },
+    }, summerDropActive),
   };
 }

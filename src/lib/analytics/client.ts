@@ -6,7 +6,7 @@ import type { CommerceEventName } from "./commerce";
 const SESSION_KEY = "luzela_funnel_session_v1";
 const QA_KEY = "luzela_funnel_qa_v1";
 const SESSION_LENGTH = 30 * 60 * 1000;
-type Detail = { product_id?: string; product_sku?: string; quantity?: number; value_cents?: number; metadata?: { item_count?: number } };
+type Detail = { product_id?: string; product_sku?: string; quantity?: number; value_cents?: number; campaign?: string; ref?: string; metadata?: { item_count?: number } };
 const safePath = () => ["/", "/cart", "/checkout", "/checkout/payment", "/checkout/success", "/chavolines"].includes(location.pathname)
   ? location.pathname : "/other";
 
@@ -62,8 +62,13 @@ export function trackCommerce(event_name: CommerceEventName, detail: Detail = {}
       if (sessionStorage.getItem(storageKey)) return;
       sessionStorage.setItem(storageKey, "1");
     }
+    const campaignAttribution = payload.campaign
+      ? { campaign: payload.campaign, ...(payload.ref ? { ref: payload.ref } : {}) }
+      : payload.product_sku === "LUZ-SUMMER-3X"
+      ? { campaign: "summer_drop", ref: "summerdrop" }
+      : {};
     const body = JSON.stringify({ event_name: name, anonymous_session_id: id,
-      ...(key ? { event_key: `${id}:${key}` } : {}), ...payload, ...attribution(), is_qa: isAnalyticsQa(), currency: "mxn" });
+      ...(key ? { event_key: `${id}:${key}` } : {}), ...payload, ...attribution(), ...campaignAttribution, is_qa: isAnalyticsQa(), currency: "mxn" });
     try {
       if (navigator.sendBeacon) {
         navigator.sendBeacon("/api/analytics", new Blob([body], { type: "application/json" }));

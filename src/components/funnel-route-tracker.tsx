@@ -9,8 +9,13 @@ export function FunnelRouteTracker() {
   useEffect(() => {
     if (/^\/(admin|auth|collab)(\/|$)/.test(path)) return;
     if (path === "/") trackCommerce("view_home", {}, "view_home");
-    if (path === "/chavolines" || new URLSearchParams(location.search).get("utm_campaign") === "luzela_x_chavolines") {
-      trackCommerce("view_campaign", {}, "view_campaign");
+    const params = new URLSearchParams(location.search);
+    const campaign = params.get("utm_campaign") || (params.get("ref") === "summerdrop" ? "summer_drop" : "");
+    if (path === "/chavolines" || campaign === "luzela_x_chavolines") {
+      trackCommerce("view_campaign", {}, "view_campaign:luzela_x_chavolines");
+    }
+    if (campaign === "summer_drop") {
+      trackCommerce("view_campaign", { campaign: "summer_drop", ref: "summerdrop" }, "view_campaign:summer_drop");
     }
     if (path === "/" && location.hash === "#tienda") trackCommerce("view_shop", {}, "view_shop");
     const onHash = () => { if (location.hash === "#tienda") trackCommerce("view_shop", {}, "view_shop"); };

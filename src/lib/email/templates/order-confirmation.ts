@@ -15,6 +15,7 @@ export type OrderConfirmationEmailData = {
   totalCents: number;
   discountCents?: number;
   discountCode?: string | null;
+  discountLabel?: string | null;
   discountPercent?: number | null;
   subtotalCents: number;
   shippingCents: number;
@@ -88,7 +89,7 @@ export function renderOrderConfirmationEmail(data: OrderConfirmationEmailData): 
         <span>Subtotal</span><strong style="color:#171310;">${formatMoney(data.subtotalCents, data.currency)}</strong>
       </div>
       <div style="display:flex;justify-content:space-between;gap:18px;margin-top:10px;font-size:14px;color:#716a63;">
-        ${data.discountCents ? `<span>Beneficio ${escapeHtml(data.discountCode || '')} (${data.discountPercent || 0}%)</span><strong>−${formatMoney(data.discountCents,data.currency)}</strong></div><div style="display:flex;justify-content:space-between;margin-top:10px">` : ''}
+        ${data.discountCents ? `<span>${escapeHtml(data.discountLabel || `Beneficio ${data.discountCode || ""}${data.discountPercent ? ` (${data.discountPercent}%)` : ""}`)}</span><strong>−${formatMoney(data.discountCents,data.currency)}</strong></div><div style="display:flex;justify-content:space-between;margin-top:10px">` : ''}
         <span>Envío</span><strong style="color:#171310;">${data.shippingCents ? formatMoney(data.shippingCents, data.currency) : "Incluido"}</strong>
       </div>
       <div style="display:flex;justify-content:space-between;gap:18px;margin-top:14px;padding-top:14px;border-top:1px solid #e7ded2;font-size:16px;color:#171310;">
@@ -125,7 +126,7 @@ export function renderOrderConfirmationEmail(data: OrderConfirmationEmailData): 
       itemsText,
       "",
       `Subtotal: ${formatMoney(data.subtotalCents, data.currency)}`,
-      data.discountCents ? `Beneficio ${data.discountCode || ""} (${data.discountPercent || 0}%): −${formatMoney(data.discountCents,data.currency)}` : "",
+      data.discountCents ? `${data.discountLabel || `Beneficio ${data.discountCode || ""}${data.discountPercent ? ` (${data.discountPercent}%)` : ""}`}: −${formatMoney(data.discountCents,data.currency)}` : "",
       `Envío: ${data.shippingCents ? formatMoney(data.shippingCents, data.currency) : "Incluido"}`,
       `Total: ${formatMoney(data.totalCents, data.currency)}`,
       "",
