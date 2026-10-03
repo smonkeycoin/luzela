@@ -14,7 +14,7 @@ export function FunnelRouteTracker() {
     if (path === "/chavolines" || campaign === "luzela_x_chavolines") {
       trackCommerce("view_campaign", {}, "view_campaign:luzela_x_chavolines");
     }
-    if (campaign === "summer_drop") {
+    if (path === "/summer-drop" || campaign === "summer_drop") {
       trackCommerce("view_campaign", { campaign: "summer_drop", ref: "summerdrop" }, "view_campaign:summer_drop");
     }
     if (path === "/" && location.hash === "#tienda") trackCommerce("view_shop", {}, "view_shop");

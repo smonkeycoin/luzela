@@ -4,7 +4,7 @@ const one = "193a1b97-0cc7-45bf-b4cd-84092a2a8ab8";
 const two = "5967228b-715e-4f35-b6d8-a664547124ea";
 const three = "5585efae-a6b2-4462-8ca7-707881a030c6";
 const wholesale = "1b0755ae-0ede-4ad0-9357-192a693472c8";
-const packs = [[one,45900,41310],[two,76900,69210],[three,81900,73710]] as const;
+const packs = [[one,45900,41310],[two,76900,69210],[three,76900,76900]] as const;
 for (const width of [390,1440]) {
  test(`private code, prices and cart at ${width}px`,async({page})=>{
   await page.setViewportSize({width,height:900});
@@ -18,6 +18,14 @@ for (const width of [390,1440]) {
    expect(await page.content()).not.toContain(privateCode);
    await page.getByRole("link",{name:"Continuar al checkout"}).click();
    await expect(page.getByRole("heading",{name:/Compra rápida/})).toBeVisible();
+   if (id === three) {
+    await expect(page.getByText("SUMMER DROP ya incluye una promoción especial", { exact: false })).toBeVisible();
+    await expect(page.getByRole("textbox", { name: "Código de descuento", exact: true })).toHaveCount(0);
+    const summary = page.locator(width < 1024 ? "details" : "aside");
+    if (width < 1024) await page.getByText("Resumen de compra", { exact: true }).click();
+    await expect(summary.locator("dt").filter({ hasText: /^Total$/ }).locator("..").locator("dd")).toHaveText("$769.00");
+    continue;
+   }
    const input=page.getByRole("textbox",{name:"Código de descuento",exact:true});
    await expect(input).toHaveValue("");
    await expect(page.locator('input[name="coupon_code"]')).toHaveValue("");
@@ -29,7 +37,6 @@ for (const width of [390,1440]) {
    await page.getByRole("button",{name:"Aplicar",exact:true}).click();
    await expect(page.getByText("✓ Descuento aplicado",{exact:false})).toBeVisible();
    await expect(summary.locator("dt").filter({hasText:/^Total$/}).locator("..").locator("dd")).toHaveText(`$${(total/100).toFixed(2)}`);
-   if(id===three) await page.screenshot({path:`docs/qa/pricing-18-checkout-${width}.png`,fullPage:true});
    await page.locator('input[name="quantity"]').fill("2");
    await expect(summary.getByText("Cantidad: 2 packs")).toBeVisible();
    await expect(summary.locator("dt").filter({hasText:/^Total$/}).locator("..").locator("dd")).toHaveText(new Intl.NumberFormat("es-MX",{style:"currency",currency:"MXN"}).format(total*2/100));
@@ -38,7 +45,7 @@ for (const width of [390,1440]) {
    expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1)).toBe(true);
   }
   await page.goto("/chavolines");
-  await expect(page).toHaveURL(/\/#tienda$/);
+  await expect(page).toHaveURL(/\/\?.*ref=chavolines.*#tienda$/);
   expect(await page.content()).not.toContain(privateCode);
   await page.locator("#tienda").screenshot({path:`docs/qa/pricing-18-storefront-${width}.png`});
   expect(errors).toEqual([]);
@@ -47,6 +54,7 @@ for (const width of [390,1440]) {
 test("server quotes all three packs, rejects hidden packs and unknown codes",async({request})=>{
  for(const [variant,subtotalCents,total] of packs) {
   const r=await request.post("/api/promo",{data:{code:privateCode,variant,quantity:1}});
+  if (variant === three) { expect(r.status()).toBe(400); continue; }
   expect(r.status()).toBe(200);
   expect(await r.json()).toMatchObject({percent:10,subtotalCents,discountCents:subtotalCents-total});
  }
@@ -85,6 +93,21 @@ test("anonymous visitors cannot open portal, admin or CSV", async ({
   ).toBe(401);
   await page.goto("/admin/collaborations");
   await expect(page).toHaveURL(/\/auth\/login/);
+});
+
+test("collaborator login hands off to Google with the protected callback", async ({ page, context }) => {
+  let authorizationUrl = "";
+  await page.route("**/auth/v1/authorize?**", async route => {
+    authorizationUrl = route.request().url();
+    await route.fulfill({ status: 200, contentType: "text/html", body: "OAuth handoff captured for QA" });
+  });
+  await page.goto("/collab/login?funnel_qa=1");
+  await page.getByRole("button", { name: "Continuar con Google" }).click();
+  await expect.poll(() => authorizationUrl).toContain("provider=google");
+  const url = new URL(authorizationUrl);
+  expect(url.searchParams.get("prompt")).toBe("select_account");
+  expect(new URL(url.searchParams.get("redirect_to")!).pathname).toBe("/auth/callback");
+  expect((await context.cookies()).find(cookie => cookie.name === "luzela_auth_destination")?.value).toBe("collab");
 });
 
 test("checkout shows stale-promo rejection without losing customer input or submitting twice", async ({

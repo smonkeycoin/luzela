@@ -66,6 +66,7 @@ export function TravelingBottle() {
 
       const hero = centerOf(document.querySelector("[data-travel-hero-bottle]"));
       const benefits = document.querySelector("[data-travel-benefits]");
+      const campaign = document.querySelector("#summer-drop");
       const products = document.querySelector("[data-travel-products]");
       const stickySlot = centerOf(document.querySelector("[data-travel-sticky-slot]"));
       const reviews = document.querySelector("[data-travel-exit]");
@@ -149,7 +150,10 @@ export function TravelingBottle() {
         x: primary.x,
         y: primary.y,
         scale: primary.scale,
-        opacity: 1 - Math.max(exitProgress, mobileProductExit, productExitProgress),
+        // Finish the bottle journey before the campaign's own composition.
+        opacity: 1 - Math.max(exitProgress, mobileProductExit, productExitProgress, campaign
+          ? smooth((viewportHeight * 0.9 - campaign.getBoundingClientRect().top) / (viewportHeight * 0.3))
+          : 0),
       });
       setReady(true);
       document.documentElement.classList.add("traveling-luzela-ready");

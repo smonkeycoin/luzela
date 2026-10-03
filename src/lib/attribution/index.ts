@@ -63,14 +63,29 @@ export function captureAttribution(
   const expiresAt = addDays(now, ATTRIBUTION_EXPIRY_DAYS).toISOString();
   const existing = current && new Date(current.expires_at).getTime() > now.getTime() ? current : null;
   const touch = deriveTouch(input, now);
+  const visitUrl = safeUrl(input.url);
+  const internalCampaignVisit = visitUrl?.pathname === "/summer-drop" &&
+    !["utm_source", "utm_medium", "utm_campaign", "ref"].some((key) => visitUrl.searchParams.has(key));
+  if (existing && internalCampaignVisit) {
+    // Visiting the campaign from another storefront page must retain acquisition credit.
+    touch.source = existing.last_touch.source;
+    touch.medium = existing.last_touch.medium;
+    touch.content = existing.last_touch.content;
+    touch.term = existing.last_touch.term;
+    touch.ref = existing.last_touch.ref;
+  }
   const shouldUpdateLast = isMeaningfulTouch(touch) || !existing;
   const firstTouch = existing?.first_touch || touch;
   const lastTouch = shouldUpdateLast ? touch : existing?.last_touch || touch;
+  const collabTouch = internalCampaignVisit && existing?.collab_touch
+    ? existing.collab_touch
+    : touch.campaign === "luzela_x_chavolines" || touch.ref === "chavolines" || touch.landing_path.split("?")[0] === "/chavolines"
+      ? touch : existing?.collab_touch;
 
   return {
     first_touch: firstTouch,
     last_touch: lastTouch,
-    ...((touch.campaign === "luzela_x_chavolines" || touch.ref === "chavolines" || touch.landing_path.split("?")[0] === "/chavolines") ? {collab_touch:touch} : existing?.collab_touch ? {collab_touch:existing.collab_touch} : {}),
+    ...(collabTouch ? { collab_touch: collabTouch } : {}),
     expires_at: expiresAt,
   };
 }
@@ -187,7 +202,7 @@ function deriveTouch({ url, referrer, now = new Date() }: CaptureInput, seenAt: 
   const utmMedium = sanitizeLower(params.get("utm_medium"));
   const referral = sanitizeLower(params.get("ref"));
   const collab = referral === 'chavolines' || parsedUrl?.pathname === '/chavolines' || params.get('utm_campaign') === 'luzela_x_chavolines';
-  const summerDrop = referral === "summerdrop" || params.get("utm_campaign") === "summer_drop";
+  const summerDrop = parsedUrl?.pathname === "/summer-drop" || referral === "summerdrop" || params.get("utm_campaign") === "summer_drop";
   const campaign = sanitizeText(params.get("utm_campaign")) || (collab ? 'luzela_x_chavolines' : summerDrop ? 'summer_drop' : '');
   const content = sanitizeText(params.get("utm_content"));
   const term = sanitizeText(params.get("utm_term"));
@@ -195,8 +210,8 @@ function deriveTouch({ url, referrer, now = new Date() }: CaptureInput, seenAt: 
 
   if (utmSource || utmMedium || campaign || content || term) {
     return buildTouch({
-      source: utmSource || (collab ? "elmundoenpareja" : "unknown"),
-      medium: utmMedium || (collab ? "creator" : "unknown"),
+      source: utmSource || (collab ? "elmundoenpareja" : summerDrop ? "direct" : "unknown"),
+      medium: utmMedium || (collab ? "creator" : summerDrop ? "none" : "unknown"),
       campaign,
       content,
       term,

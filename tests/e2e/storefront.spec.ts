@@ -32,10 +32,10 @@ test("storefront loads and shows products", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "SUMMER 2X" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "SUMMER 3X" })).toBeVisible();
   await expect(page.getByText("$459.00", {exact:true})).toBeVisible();
-  await expect(page.getByText("$769.00", {exact:true})).toBeVisible();
+  await expect(page.locator('[data-summer-pack="2x"]').getByText("$769.00", {exact:true})).toBeVisible();
   await expect(page.getByText("$819.00", {exact:true})).toBeVisible();
   await expect(page.getByText("$384.50 c/u")).toBeVisible();
-  await expect(page.getByText("$273.00 c/u")).toBeVisible();
+  await expect(page.getByText("$256.33 c/u")).toBeVisible();
   await expect(page.getByText("Ocean & Cenote Friendly").first()).toBeVisible();
   await expect(page.getByText("DEL CARIBE A TU RUTINA DIARIA")).toBeVisible();
   await expect(page.locator('[data-pack-bottle="card-1x"]')).toHaveCount(1);
@@ -60,14 +60,14 @@ test("summer pack hierarchy is editorial and has one CTA per card", async ({ pag
   for (const pack of ["1x", "2x", "3x"]) {
     const card = page.locator(`[data-summer-pack="${pack}"]`);
     const unit = pack.replace("x", "X");
-    await expect(card.getByRole("link", { name: `Elegir ${unit}`, exact: true })).toHaveCount(1);
+    await expect(card.getByRole("link", { name: pack === "3x" ? "COMPRAR SUMMER DROP" : `Elegir ${unit}`, exact: true })).toHaveCount(1);
   }
 
   const featuredCard = page.locator('[data-summer-pack="3x"]');
-  const featuredCta = featuredCard.getByRole("link", { name: "Elegir 3X", exact: true });
+  const featuredCta = featuredCard.getByRole("link", { name: "COMPRAR SUMMER DROP", exact: true });
 
-  await expect(featuredCard.getByText("SUMMER DEAL", { exact: true })).toBeVisible();
-  await expect(featuredCard.locator(".line-through")).toHaveCount(0);
+  await expect(featuredCard.getByText("SUMMER DROP", { exact: true })).toBeVisible();
+  await expect(featuredCard.locator(".line-through")).toHaveCount(1);
   await expect(featuredCard.getByText("$819.00", {exact:true})).toBeVisible();
   await expect(featuredCta).toHaveClass(/bg-\[var\(--teal\)\]/);
 });
@@ -92,13 +92,13 @@ test("cart can add a real storefront product", async ({ page }) => {
   await page
     .locator("article")
     .filter({ has: page.getByRole("heading", { name: "SUMMER 3X" }) })
-    .getByRole("link", { name: "Elegir 3X", exact: true })
+    .getByRole("link", { name: "COMPRAR SUMMER DROP", exact: true })
     .first()
     .click();
 
   await expect(page).toHaveURL(/\/cart/);
   await expect(page.getByRole("heading", { name: "Revisa tu pedido." })).toBeVisible();
-  await expect(page.getByText("SUMMER 3X").first()).toBeVisible();
+  await expect(page.getByText("SUMMER DROP").first()).toBeVisible();
   await expect(page.getByText("3 Luzelas por pack").first()).toBeVisible();
   await expect(page.getByText("$819.00", {exact:true}).first()).toBeVisible();
   await expect(page.locator('[data-pack-bottle="cart-3x"]')).toHaveCount(3);

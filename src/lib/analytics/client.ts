@@ -7,7 +7,7 @@ const SESSION_KEY = "luzela_funnel_session_v1";
 const QA_KEY = "luzela_funnel_qa_v1";
 const SESSION_LENGTH = 30 * 60 * 1000;
 type Detail = { product_id?: string; product_sku?: string; quantity?: number; value_cents?: number; campaign?: string; ref?: string; metadata?: { item_count?: number } };
-const safePath = () => ["/", "/cart", "/checkout", "/checkout/payment", "/checkout/success", "/chavolines"].includes(location.pathname)
+const safePath = () => ["/", "/cart", "/checkout", "/checkout/payment", "/checkout/success", "/chavolines", "/summer-drop"].includes(location.pathname)
   ? location.pathname : "/other";
 
 function session() {
@@ -46,7 +46,7 @@ function attribution() {
       source: safe(last?.source || params.get("utm_source")), medium: safe(last?.medium || params.get("utm_medium")),
       campaign: safe(last?.campaign || params.get("utm_campaign")), content: safe(last?.content || params.get("utm_content")),
       ref: safe(last?.ref || params.get("ref")),
-      landing_path: ["/", "/cart", "/checkout", "/checkout/payment", "/checkout/success", "/chavolines"].includes(landingPath) ? landingPath : "/other",
+      landing_path: ["/", "/cart", "/checkout", "/checkout/payment", "/checkout/success", "/chavolines", "/summer-drop"].includes(landingPath) ? landingPath : "/other",
       referrer_domain: (() => { try { return new URL(document.referrer).hostname.slice(0, 160); } catch { return undefined; } })(),
     };
   } catch { return { landing_path: safePath() }; }

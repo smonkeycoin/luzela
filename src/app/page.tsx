@@ -7,9 +7,10 @@ import { PublicFooter } from "@/components/public-footer";
 import { PublicHeader } from "@/components/public-header";
 import { ShopSection } from "@/components/shop-section";
 import { TravelingBottle } from "@/components/traveling-bottle";
+import { SummerDropCampaign } from "@/components/summer-drop-campaign";
+import { isSummerDropProduct } from "@/lib/catalog/summer-drop";
 import { getActiveProducts } from "@/lib/catalog/get-active-products";
 import { getFeatureFlags } from "@/lib/settings";
-import { isSummerDropProduct } from "@/lib/catalog/summer-drop";
 
 export const dynamic = "force-dynamic";
 
@@ -40,7 +41,7 @@ export default async function Home() {
     getActiveProducts(),
     getFeatureFlags(),
   ]);
-  const summerDropActive = products.some(isSummerDropProduct);
+  const summerDropProduct = products.find(isSummerDropProduct);
 
   return (
     <main className="min-h-screen">
@@ -57,25 +58,23 @@ export default async function Home() {
           className="absolute inset-0 -z-10 h-full w-full object-cover opacity-28"
         />
         <div className="absolute inset-0 -z-10 bg-[var(--background)]/68" />
-        <div className="mx-auto grid min-h-[68vh] max-w-7xl gap-7 px-5 py-9 sm:px-8 lg:min-h-[calc(100vh-4rem)] lg:grid-cols-[1fr_0.8fr] lg:items-center lg:gap-10 lg:py-12">
+        <div className="mx-auto grid min-h-[calc(100vh-4rem)] max-w-7xl gap-10 px-5 py-12 sm:px-8 lg:grid-cols-[1fr_0.8fr] lg:items-center">
           <div className="max-w-3xl">
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--teal)]">
-              {summerDropActive ? "SUMMER DROP" : "SUMMER LUZELA"}
+              SUMMER LUZELA
             </p>
             <h1 className="mt-5 max-w-4xl text-5xl font-semibold leading-[1.02] text-[var(--ink)] sm:text-7xl">
-              {summerDropActive ? <><span className="block">PAGA 2.</span><span className="block">RECIBE 3.</span></> : "Más Luzela. Más días bajo el sol."}
+              Más Luzela. Más días bajo el sol.
             </h1>
             <p className="mt-6 max-w-xl text-base leading-8 text-[var(--muted)] sm:text-lg">
-              {summerDropActive
-                ? "Tres Luzelas por $769, con envío incluido. Edición limitada, hasta agotar existencias."
-                : "Protección solar mineral SPF 50+. Elige la cantidad que acompaña tu verano."}
+              Protección solar mineral SPF 50+. Elige la cantidad que acompaña tu verano.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
-                href={summerDropActive ? "/summer-drop" : "/#tienda"}
+                href="/#tienda"
                 className="focus-ring inline-flex h-12 items-center justify-center gap-2 bg-[var(--ink)] px-5 text-sm font-semibold text-white transition hover:bg-black"
               >
-                {summerDropActive ? "COMPRAR SUMMER DROP" : "Ver productos"}
+                Ver Summer Packs
                 <ArrowRight size={18} aria-hidden />
               </Link>
               <Link
@@ -117,6 +116,7 @@ export default async function Home() {
       </section>
 
       <CollabProof />
+      {summerDropProduct ? <SummerDropCampaign product={summerDropProduct} /> : null}
       <ShopSection products={products} error={error} />
 
       {featureFlags.publicReviewsEnabled ? (

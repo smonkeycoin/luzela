@@ -191,7 +191,7 @@ export function CartView({
               )}
             </dd>
           </div>
-          {!canQuoteCart ? <>
+          {!canQuoteCart || summerDrop ? <>
           {summerDrop ? <>
             <div className="flex justify-between gap-4 border-b border-[var(--line)] pb-3">
               <dt className="text-[var(--muted)]">Precio regular</dt>

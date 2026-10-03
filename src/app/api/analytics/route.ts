@@ -14,7 +14,7 @@ const schema = z.strictObject({
   first_source: short, first_medium: short, first_campaign: short, first_content: short, first_ref: short,
   source: short, medium: short, campaign: short, content: short, ref: short,
   referrer_domain: z.string().max(160).regex(/^[a-z0-9.-]*$/i).optional(),
-  landing_path: z.enum(["/", "/cart", "/checkout", "/checkout/payment", "/checkout/success", "/chavolines", "/other"]).optional(),
+  landing_path: z.enum(["/", "/cart", "/checkout", "/checkout/payment", "/checkout/success", "/chavolines", "/summer-drop", "/other"]).optional(),
   is_qa: z.boolean().optional(),
   metadata: z.strictObject({ item_count: z.number().int().min(0).max(100).optional() }).optional(),
 });

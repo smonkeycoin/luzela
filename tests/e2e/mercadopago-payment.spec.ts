@@ -33,4 +33,5 @@ test("Mercado Pago Card Payment Brick renders without submitting payment", async
   });
 
   expect(brickHasRendered).toBe(true);
+  await page.getByTestId("mercadopago-card-payment").screenshot({ path: "docs/qa/landing-recovery/card-brick-ready.png" });
 });

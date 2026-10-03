@@ -38,7 +38,8 @@ test("public metadata is branded for Luzela", async ({ page, request }) => {
     "/apple-icon",
   );
 
-  const head = await page.locator("head").innerHTML();
+  // Branding metadata must be Luzela; installed observability scripts legitimately use Vercel paths.
+  const head = await page.locator("head title, head meta, head link[rel='canonical']").evaluateAll(elements => elements.map(element => element.outerHTML).join(""));
   expect(head).not.toMatch(/vercel|vercel\.app/i);
 
   const ogImage = await request.get("/opengraph-image");

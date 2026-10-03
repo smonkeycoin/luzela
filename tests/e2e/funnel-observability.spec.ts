@@ -9,7 +9,7 @@ async function chooseSummer3x(page: import("@playwright/test").Page) {
   await expect(product).toBeVisible();
   await product.scrollIntoViewIfNeeded();
   await page.waitForTimeout(1300);
-  await product.getByRole("link", { name: /Elegir 3X/i }).click();
+  await product.getByRole("link", { name: /COMPRAR SUMMER DROP/i }).click();
   await expect(page).toHaveURL(/\/cart\?/);
   await expect(page.getByRole("heading", { name: /Summer/i }).first()).toBeVisible();
 }
