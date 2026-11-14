@@ -1,0 +1,1298 @@
+.home {
+  --ink: #153e40;
+  --foreground: #153e40;
+  --muted: #606764;
+  --teal: #246b68;
+  --background: #faf7f2;
+  --paper: #fffdf8;
+  --line: #deded3;
+  background: var(--background);
+  color: var(--ink);
+  min-height: 100vh
+}
+.home :is(a,button,input,summary):focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 5px
+}
+.home :is(h1,h2,h3) {
+  text-wrap: balance
+}
+.home :is(section,div[id]) {
+  scroll-margin-top: 28px
+}
+.home :is(h1,h2,h3,blockquote) {
+  font-family: Georgia,'Times New Roman',serif;
+  font-weight: 400
+}
+.home em {
+  font-weight: 400;
+  color: #437c75
+}
+.home header {
+  position: relative;
+  z-index: 5;
+  background: var(--background)
+}
+.home header>div {
+  height: 84px
+}
+.home header a:first-child {
+  font-family: var(--font-montserrat),Arial,Helvetica,sans-serif
+}
+.skipLink {
+  position: absolute;
+  z-index: 20;
+  left: 20px;
+  top: -80px;
+  background: var(--ink);
+  color: white;
+  padding: 14px 20px
+}
+.skipLink:focus {
+  top: 12px
+}
+.eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-montserrat),Arial,sans-serif;
+  font-size: 10px!important;
+  line-height: 1.6!important;
+  font-weight: 600;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--ink)!important
+}
+.hero {
+  display: grid;
+  grid-template-columns: 1fr 1.05fr;
+  max-width: 1600px;
+  margin: auto;
+  min-height: 600px
+}
+.heroCopy {
+  align-self: center;
+  padding: 68px 32px 50px max(40px,calc((100vw - 1280px)/2));
+  position: relative;
+  z-index: 1
+}
+.hero h1 {
+  font-size: clamp(54px,5.6vw,86px);
+  line-height: 1.08;
+  letter-spacing: -.055em;
+  margin: 26px 0 22px
+}
+.heroDescription {
+  font-size: 16px;
+  line-height: 1.9;
+  color: #4c605d;
+  max-width: 440px;
+  margin: 0 0 30px
+}
+.button,.outlineButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  min-height: 48px;
+  padding: 14px 27px;
+  border-radius: 40px;
+  background: var(--ink);
+  border: 1px solid var(--ink);
+  color: white;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: .065em;
+  text-transform: uppercase;
+  transition: background .18s,color .18s
+}
+.button:hover {
+  background: #2f6663
+}
+.outlineButton {
+  background: transparent;
+  color: var(--ink)
+}
+.outlineButton:hover {
+  background: #e5ece5
+}
+.heroFootnote {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  margin-top: 56px;
+  font-size: 10px;
+  letter-spacing: .035em;
+  color: var(--muted)
+}
+.heroFootnote span+span {
+  border-left: 1px solid #bfc9c1;
+  padding-left: 18px
+}
+.heroVisual {
+  position: relative;
+  isolation: isolate;
+  min-height: 600px;
+  overflow: hidden;
+  background: #e4dfd2
+}
+.heroBackdrop {
+  object-fit: cover;
+  opacity: .8
+}
+.heroEditorial {
+  position: absolute;
+  inset: 0 18% 0 0;
+  overflow: hidden;
+  border-radius: 0 0 42% 0
+}
+.heroEditorial img {
+  object-position: 48% center
+}
+.heroEditorial>span {
+  position: absolute;
+  left: 30px;
+  bottom: 30px;
+  color: white;
+  font-family: Georgia,serif;
+  font-style: italic;
+  font-size: 23px;
+  text-shadow: 0 1px 12px #503721
+}
+.coverImage {
+  object-fit: cover
+}
+.heroBottle {
+  position: absolute;
+  right: -1%;
+  bottom: 15px;
+  height: 63%;
+  width: 46%;
+  filter: drop-shadow(10px 16px 13px #604c3528)
+}
+.heroEdition {
+  position: absolute;
+  right: 16px;
+  top: 32px;
+  writing-mode: vertical-rl;
+  font-size: 9px;
+  letter-spacing: .2em
+}
+.bottles {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  min-height: 120px
+}
+.bottle {
+  position: absolute;
+  bottom: 0;
+  height: 100%;
+  width: auto;
+  max-width: none;
+  transform: translateX(-50%);
+  object-fit: contain;
+  filter: drop-shadow(4px 12px 8px #4f54351a)
+}
+.bottles[data-bottle-count="3"] .bottle:nth-child(2) {
+  height: 100%;
+  z-index: 4!important
+}
+.bottles[data-bottle-count="3"] .bottle:is(:first-child,:last-child) {
+  height: 91%
+}
+.wholesaleLabel {
+  position: absolute;
+  top: 0;
+  right: 10px;
+  background: var(--background);
+  padding: 10px;
+  font-size: 12px
+}
+.trustStrip {
+  display: flex;
+  justify-content: center;
+  gap: 88px;
+  flex-wrap: wrap;
+  padding: 25px 24px;
+  border-bottom: 1px solid var(--line)
+}
+.trustStrip span {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  letter-spacing: .045em
+}
+.trustStrip svg {
+  width: 23px;
+  height: 23px;
+  stroke-width: 1.25
+}
+.home>section[aria-label="Visto en"] {
+  padding: 16px 24px;
+  background: #f2f2e9;
+  border: 0
+}
+.home>section[aria-label="Visto en"] img {
+  width: 160px
+}
+.benefits,.shop,.reviews,.faq {
+  max-width: 1360px;
+  margin: auto;
+  padding: 85px 40px
+}
+.sectionHeading {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 30px;
+  margin-bottom: 38px
+}
+.sectionHeading h2,.experience h2,.story h2,.faq h2 {
+  font-size: clamp(32px,3.35vw,48px);
+  line-height: 1.16;
+  letter-spacing: -.035em;
+  margin-top: 15px
+}
+.sectionHeading>p {
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--muted)
+}
+.textLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 44px;
+  font-size: 11px;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-color: #a5b6ac
+}
+.benefitGrid {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 28px
+}
+.benefitImage {
+  position: relative;
+  aspect-ratio: 1.75;
+  margin-bottom: 24px;
+  overflow: hidden
+}
+.benefitGrid h3 {
+  font-size: 27px;
+  margin: 8px 0 10px;
+  line-height: 1.2
+}
+.benefitGrid article>p:not(.eyebrow) {
+  font-size: 12px;
+  color: var(--muted);
+  line-height: 1.9;
+  max-width: 360px
+}
+.editorialNote {
+  font-size: 10px!important;
+  line-height: 1.8!important;
+  color: #616761!important;
+  margin-top: 24px
+}
+.experience {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  max-width: 1280px;
+  margin: 0 auto 80px;
+  background: #efeee5
+}
+.experienceImage {
+  position: relative;
+  min-height: 560px;
+  overflow: hidden
+}
+.experienceCopy {
+  padding: 62px 66px;
+  align-self: center
+}
+.experienceCopy>p:not(.eyebrow):not(.editorialNote) {
+  font-size: 13px;
+  line-height: 1.9;
+  color: var(--muted);
+  margin-top: 22px
+}
+.experienceCopy ul {
+  margin: 30px 0 18px;
+  display: grid;
+  gap: 22px;
+  list-style: none
+}
+.experienceCopy li {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px
+}
+.experienceCopy li>span {
+  font-size: 11px;
+  border-bottom: 1px solid #9ea89e;
+  padding: 5px 0;
+  color: #728477
+}
+.experienceCopy strong {
+  font-size: 12px;
+  font-weight: 600
+}
+.experienceCopy li p {
+  font-size: 11px;
+  line-height: 1.8;
+  margin-top: 4px;
+  color: var(--muted)
+}
+.campaignWrap {
+  max-width: 1440px;
+  margin: auto
+}
+.campaign {
+  display: grid;
+  grid-template-columns: 1.1fr .8fr .8fr;
+  gap: 12px;
+  align-items: center;
+  background: #dcece7;
+  padding: 40px max(40px,calc((100vw - 1280px)/2));
+  min-height: 320px;
+  overflow: hidden
+}
+.campaignCopy h2 {
+  font-size: 35px;
+  line-height: 1.16;
+  letter-spacing: -.035em;
+  margin: 19px 0
+}
+.campaignCopy>p {
+  font-size: 12px;
+  line-height: 1.8;
+  max-width: 310px
+}
+.campaignRibbon {
+  display: inline-block;
+  background: #f8f6eb;
+  padding: 7px 12px;
+  font-size: 9px!important;
+  letter-spacing: .12em;
+  font-weight: 600;
+  text-transform: uppercase
+}
+.campaignOffer {
+  font-size: 15px!important;
+  font-weight: 600;
+  margin-bottom: 8px
+}
+.campaignProduct {
+  height: 265px;
+  min-width: 0
+}
+.campaignCommerce {
+  padding: 18px 0 18px 30px;
+  border-left: 1px solid #a4c7be
+}
+.campaignPrice {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin: 13px 0 5px;
+  font-family: var(--font-montserrat),Arial,sans-serif
+}
+.campaignPrice>span {
+  font-size: 30px;
+  letter-spacing: -.055em;
+  font-weight: 500;
+  line-height: 1.2
+}
+.campaignPrice small {
+  font-size: 9px;
+  font-weight: 500
+}
+.campaignPrice del {
+  font-size: 13px;
+  color: var(--muted)
+}
+.campaignCommerce>p {
+  font-size: 11px;
+  margin-bottom: 18px
+}
+.campaignCommerce .button {
+  font-size: 9px;
+  padding: 12px 18px;
+  gap: 12px
+}
+.campaignCommerce>small {
+  display: block;
+  max-width: 250px;
+  font-size: 9px;
+  line-height: 1.8;
+  margin-top: 14px;
+  color: #466662
+}
+.shop {
+  scroll-margin-top: 15px!important
+}
+.packOptions {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 14px;
+  border: 0;
+  padding: 0;
+  margin: 0 0 25px
+}
+.packOption {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 16px;
+  cursor: pointer;
+  border: 1px solid #d9dcd1;
+  padding: 20px 24px;
+  min-height: 96px;
+  border-radius: 8px;
+  background: #fffcf7;
+  transition: background .18s,border-color .18s
+}
+.packOption[data-selected="true"] {
+  border-color: #648d83;
+  background: #e6efea
+}
+.packOption input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+  margin: 0
+}
+.packOption:has(input:focus-visible) {
+  outline: 2px solid var(--teal);
+  outline-offset: 4px
+}
+.packOption>span:nth-of-type(2) {
+  text-align: right;
+  font-size: 17px;
+  font-weight: 500;
+  align-self: center
+}
+.packOption small {
+  grid-column: 1/-1;
+  text-align: right;
+  color: var(--muted);
+  font-size: 10px
+}
+.packOptionTop {
+  display: flex;
+  gap: 10px;
+  align-items: center
+}
+.packOptionTop strong {
+  font-size: 20px;
+  font-weight: 500
+}
+.packOptionTop svg {
+  opacity: 0
+}
+.packOption[data-selected="true"] .packOptionTop svg {
+  opacity: 1
+}
+.selectedProduct {
+  display: grid;
+  grid-template-columns: 1.05fr 1fr;
+  gap: 0;
+  border: 1px solid #dfdfd3;
+  overflow: hidden;
+  border-radius: 8px
+}
+.productStage {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  min-height: 490px;
+  isolation: isolate;
+  overflow: hidden;
+  background: #eae4d6
+}
+.stageBackground {
+  object-fit: cover;
+  z-index: -1;
+  opacity: .7
+}
+.productStage .bottles {
+  width: 75%;
+  height: 335px;
+  flex: none;
+  margin: 20px 0
+}
+.productStage>p {
+  position: relative;
+  font-size: 10px;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+  padding: 15px 10px
+}
+.catalogImage {
+  position: relative;
+  height: 350px;
+  width: auto;
+  object-fit: contain
+}
+.productDetails {
+  padding: 46px 56px;
+  background: #fdfbf6;
+  display: flex;
+  flex-direction: column;
+  justify-content: center
+}
+.productDetails h3 {
+  font-size: 34px;
+  letter-spacing: -.035em;
+  margin: 10px 0 6px
+}
+.variantName {
+  font-size: 11px;
+  color: var(--muted)
+}
+.productDetails .campaignPrice {
+  margin-top: 25px
+}
+.productDetails .campaignPrice>span {
+  font-size: 36px
+}
+.unitPrice {
+  font-size: 12px;
+  color: var(--muted);
+  margin-top: 8px
+}
+.savings {
+  font-size: 11px;
+  color: #26685c;
+  margin-top: 10px
+}
+.productDescription {
+  font-size: 12px;
+  line-height: 1.8;
+  color: var(--muted);
+  margin: 20px 0
+}
+.stock {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  margin: 18px 0;
+  color: #31695e
+}
+.stock span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor
+}
+.stock[data-available="false"] {
+  color: #914d35
+}
+.purchaseButton>a {
+  width: 100%;
+  border-radius: 40px;
+  background: var(--ink);
+  font-size: 11px;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  min-height: 48px
+}
+.purchaseButton>a[aria-disabled="true"] {
+  background: #ddd;
+  color: #555
+}
+.shippingNote {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  margin-top: 16px
+}
+.checkoutNote {
+  font-size: 9px;
+  line-height: 1.8;
+  text-align: center;
+  color: var(--muted);
+  margin-top: 12px
+}
+.emptyState {
+  padding: 30px;
+  border: 1px solid var(--line);
+  font-size: 14px
+}
+.emptyState a {
+  text-decoration: underline
+}
+.reviews {
+  border-top: 1px solid var(--line);
+  padding-top: 65px
+}
+.reviewGrid {
+  display: grid;
+  grid-template-columns: repeat(4,minmax(0,1fr));
+  gap: 24px
+}
+.reviewGrid figure {
+  border-top: 1px solid #b8c8bd;
+  padding: 20px 12px 0 0;
+  display: flex;
+  flex-direction: column
+}
+.quoteMark {
+  font-family: Georgia,serif;
+  font-size: 52px;
+  line-height: .9;
+  color: #7a9d8e
+}
+.reviewGrid blockquote {
+  font-size: 19px;
+  line-height: 1.5;
+  margin: 8px 0 25px;
+  flex: 1
+}
+.reviewGrid figcaption {
+  font-size: 11px;
+  font-weight: 600
+}
+.story {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  max-width: 1440px;
+  margin: auto;
+  background: #eee9df
+}
+.storyImage {
+  position: relative;
+  min-height: 490px
+}
+.storyImage img {
+  object-position: 35% center
+}
+.storyImage>span {
+  position: absolute;
+  bottom: 22px;
+  left: 30px;
+  right: 20px;
+  color: white;
+  font-size: 10px;
+  text-shadow: 0 1px 10px #102a2b;
+  letter-spacing: .06em
+}
+.storyCopy {
+  padding: 60px 70px;
+  align-self: center
+}
+.storyCopy>p:not(.eyebrow):not(.editorialNote) {
+  font-size: 13px;
+  line-height: 1.9;
+  margin: 24px 0;
+  max-width: 360px;
+  color: var(--muted)
+}
+.collaboration {
+  padding: 80px 40px;
+  max-width: 1360px;
+  margin: auto
+}
+.collaboration section {
+  background: #e8eee7
+}
+.collaboration h2 {
+  font-family: Georgia,serif;
+  font-size: 48px;
+  font-weight: 400;
+  line-height: 1.08;
+  letter-spacing: -.035em
+}
+.collaboration p {
+  font-size: 13px;
+  line-height: 1.9
+}
+.collaboration a {
+  border-radius: 40px;
+  font-size: 11px
+}
+.collaboration section>div>div:first-child {
+  min-height: 400px
+}
+.confidence {
+  display: grid;
+  grid-template-columns: repeat(4,1fr);
+  gap: 24px;
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 36px 40px;
+  max-width: 1280px;
+  margin: auto
+}
+.confidence svg {
+  width: 26px;
+  height: 26px;
+  stroke-width: 1.2;
+  margin-bottom: 14px
+}
+.confidence h3 {
+  font-family: var(--font-montserrat),sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 7px
+}
+.confidence :is(p,a) {
+  font-size: 10px;
+  color: var(--muted);
+  line-height: 1.8
+}
+.confidence a {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  margin-top: -10px
+}
+.faq {
+  display: grid;
+  grid-template-columns: .7fr 1.3fr;
+  gap: 80px
+}
+.faq>div:first-child>.textLink {
+  margin-top: 22px
+}
+.faq details {
+  border-bottom: 1px solid #d3d9cf;
+  padding: 0
+}
+.faq summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  list-style: none;
+  padding: 22px 0;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.6
+}
+.faq summary::-webkit-details-marker {
+  display: none
+}
+.faq summary svg {
+  flex-shrink: 0;
+  stroke-width: 1.3;
+  transition: transform .2s
+}
+.faq details[open] summary svg {
+  transform: rotate(45deg)
+}
+.faq details>p {
+  font-size: 12px;
+  line-height: 1.9;
+  color: var(--muted);
+  padding: 0 30px 20px 0
+}
+.faq details>.textLink {
+  margin-bottom: 20px
+}
+.home footer {
+  background: #edf0e8
+}
+.home footer h2 {
+  font-family: var(--font-montserrat),sans-serif;
+  font-weight: 600
+}
+@media(min-width:1600px) {
+  .heroCopy {
+    padding-left: 80px
+  }
+  .campaign {
+    padding-left: 80px;
+    padding-right: 80px
+  }
+}
+@media(max-width:1023px) {
+  .hero {
+    min-height: 520px
+  }
+  .heroVisual {
+    min-height: 520px
+  }
+  .heroCopy {
+    padding: 40px 30px
+  }
+  .hero h1 {
+    font-size: 58px
+  }
+  .heroDescription {
+    font-size: 14px
+  }
+  .heroFootnote {
+    flex-wrap: wrap;
+    margin-top: 32px;
+    gap: 10px
+  }
+  .heroBottle {
+    height: 55%;
+    width: 45%
+  }
+  .trustStrip {
+    gap: 45px
+  }
+  .experienceCopy {
+    padding: 40px
+  }
+  .campaign {
+    grid-template-columns: 1fr .7fr;
+    padding: 32px
+  }
+  .campaignCopy {
+    grid-column: 1
+  }
+  .campaignProduct {
+    grid-column: 2;
+    grid-row: 1/3;
+    height: 290px
+  }
+  .campaignCommerce {
+    border: 0;
+    padding: 8px 0;
+    grid-column: 1
+  }
+  .campaignCommerce .campaignPrice {
+    margin-top: 8px
+  }
+  .campaignCopy h2 {
+    font-size: 32px
+  }
+  .productDetails {
+    padding: 30px
+  }
+  .productStage {
+    min-height: 440px
+  }
+  .productStage .bottles {
+    height: 300px
+  }
+  .packOption {
+    padding: 18px
+  }
+  .reviewGrid {
+    grid-template-columns: repeat(2,1fr);
+    gap: 32px
+  }
+  .storyCopy {
+    padding: 40px
+  }
+  .faq {
+    gap: 40px
+  }
+  .confidence {
+    gap: 20px
+  }
+  .collaboration {
+    padding: 60px 30px
+  }
+  .collaboration h2 {
+    font-size: 40px
+  }
+}
+@media(max-width:767px) {
+  .home header>div {
+    height: 68px
+  }
+  .hero {
+    grid-template-columns: 1fr;
+    min-height: 0
+  }
+  .heroCopy {
+    padding: 35px 24px 30px
+  }
+  .hero h1 {
+    font-size: 52px;
+    margin: 20px 0 18px;
+    line-height: 1.04
+  }
+  .heroDescription {
+    font-size: 13px;
+    line-height: 1.8;
+    margin-bottom: 22px
+  }
+  .heroCopy>.button {
+    min-height: 46px;
+    padding: 12px 25px
+  }
+  .heroFootnote {
+    display: none
+  }
+  .heroVisual {
+    min-height: 0;
+    height: 290px;
+    margin: 0 20px 20px
+  }
+  .heroEditorial {
+    inset: 0 27% 0 0;
+    border-radius: 0 0 44% 0
+  }
+  .heroEditorial img {
+    object-position: 42% center
+  }
+  .heroEditorial>span {
+    font-size: 19px;
+    left: 18px;
+    bottom: 20px
+  }
+  .heroBottle {
+    width: 44%;
+    height: 88%;
+    right: 0;
+    bottom: 4px
+  }
+  .heroEdition {
+    right: 9px;
+    top: 14px;
+    font-size: 7px
+  }
+  .trustStrip {
+    padding: 20px 16px;
+    gap: 18px;
+    justify-content: space-around
+  }
+  .trustStrip span {
+    font-size: 8px;
+    gap: 7px
+  }
+  .trustStrip svg {
+    width: 20px;
+    height: 20px
+  }
+  .home>section[aria-label="Visto en"] {
+    gap: 18px;
+    padding: 14px
+  }
+  .home>section[aria-label="Visto en"] img {
+    width: 138px
+  }
+  .benefits,.shop,.reviews,.faq {
+    padding: 55px 24px
+  }
+  .sectionHeading {
+    display: block;
+    margin-bottom: 28px
+  }
+  .sectionHeading h2,.experience h2,.story h2,.faq h2 {
+    font-size: 35px
+  }
+  .sectionHeading>p {
+    margin-top: 17px;
+    font-size: 11px
+  }
+  .sectionHeading>.textLink {
+    margin-top: 15px
+  }
+  .benefitGrid {
+    gap: 24px;
+    grid-template-columns: 1fr
+  }
+  .benefitGrid article {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    column-gap: 18px;
+    align-content: start
+  }
+  .benefitImage {
+    grid-row: 1/4;
+    aspect-ratio: auto;
+    min-height: 150px;
+    margin: 0
+  }
+  .benefitGrid h3 {
+    font-size: 23px;
+    margin: 5px 0 7px
+  }
+  .benefitGrid article>p:not(.eyebrow) {
+    font-size: 11px;
+    line-height: 1.75
+  }
+  .benefitGrid .eyebrow {
+    font-size: 8px!important
+  }
+  .experience {
+    grid-template-columns: 1fr;
+    margin: 0 20px 50px
+  }
+  .experienceImage {
+    min-height: 0;
+    height: 240px
+  }
+  .experienceCopy {
+    padding: 32px 24px
+  }
+  .experienceCopy h2 br {
+    display: none
+  }
+  .experienceCopy h2 em:before {
+    content: ' '
+  }
+  .experienceCopy>p:not(.eyebrow):not(.editorialNote) {
+    font-size: 12px;
+    margin-top: 18px
+  }
+  .experienceCopy ul {
+    margin-top: 22px
+  }
+  .campaign {
+    grid-template-columns: 1fr 1fr;
+    gap: 0 8px;
+    padding: 30px 24px
+  }
+  .campaignCopy {
+    grid-column: 1/-1
+  }
+  .campaignCopy h2 {
+    font-size: 33px
+  }
+  .campaignCopy>p:not(.campaignRibbon) {
+    max-width: 100%;
+    font-size: 11px
+  }
+  .campaignProduct {
+    grid-column: 2;
+    grid-row: 2;
+    height: 210px;
+    align-self: center;
+    transform: translateX(9px)
+  }
+  .campaignCommerce {
+    grid-row: 2;
+    padding: 25px 0 0;
+    position: relative;
+    z-index: 1
+  }
+  .campaignCommerce .campaignPrice>span {
+    font-size: 24px
+  }
+  .campaignCommerce .campaignPrice {
+    gap: 6px
+  }
+  .campaignCommerce .button {
+    font-size: 8px;
+    line-height: 1.5;
+    padding: 10px 12px;
+    gap: 6px;
+    min-height: 44px
+  }
+  .campaignCommerce>small {
+    font-size: 8px
+  }
+  .packOptions {
+    gap: 8px;
+    margin-bottom: 16px
+  }
+  .packOption {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding: 13px 10px;
+    min-height: 100px
+  }
+  .packOptionTop {
+    justify-content: space-between;
+    gap: 4px
+  }
+  .packOptionTop strong {
+    font-size: 20px
+  }
+  .packOption>span:nth-of-type(2) {
+    font-size: 13px;
+    align-self: start
+  }
+  .packOption small {
+    text-align: left;
+    font-size: 8px;
+    line-height: 1.5
+  }
+  .packOptionTop svg {
+    width: 13px
+  }
+  .selectedProduct {
+    grid-template-columns: 1fr
+  }
+  .productStage {
+    min-height: 0;
+    height: 255px
+  }
+  .productStage .bottles {
+    height: 210px;
+    width: 70%;
+    margin: 5px 0 0
+  }
+  .productStage>p {
+    padding: 5px;
+    font-size: 8px
+  }
+  .catalogImage {
+    height: 210px
+  }
+  .productDetails {
+    padding: 25px 22px
+  }
+  .productDetails h3 {
+    font-size: 29px;
+    margin-top: 8px
+  }
+  .productDetails .campaignPrice {
+    margin-top: 19px
+  }
+  .productDetails .campaignPrice>span {
+    font-size: 31px
+  }
+  .productDescription {
+    margin: 15px 0;
+    font-size: 11px
+  }
+  .stock {
+    margin: 15px 0
+  }
+  .reviewGrid {
+    gap: 24px 18px
+  }
+  .reviewGrid figure {
+    padding-right: 0
+  }
+  .reviewGrid blockquote {
+    font-size: 17px;
+    line-height: 1.5;
+    margin-bottom: 20px
+  }
+  .reviewGrid figcaption {
+    font-size: 10px
+  }
+  .story {
+    grid-template-columns: 1fr
+  }
+  .storyImage {
+    min-height: 0;
+    height: 300px
+  }
+  .storyCopy {
+    padding: 36px 26px
+  }
+  .story h2 {
+    font-size: 40px
+  }
+  .storyCopy>p:not(.eyebrow):not(.editorialNote) {
+    font-size: 12px
+  }
+  .collaboration {
+    padding: 50px 20px
+  }
+  .collaboration section>div>div:first-child {
+    min-height: 0;
+    max-height: 380px;
+    aspect-ratio: 1.1
+  }
+  .collaboration section>div>div:nth-child(2) {
+    padding: 30px 24px
+  }
+  .collaboration h2 {
+    font-size: 42px
+  }
+  .confidence {
+    grid-template-columns: 1fr 1fr;
+    padding: 30px 24px;
+    gap: 26px 20px
+  }
+  .confidence a {
+    font-size: 9px
+  }
+  .faq {
+    grid-template-columns: 1fr;
+    gap: 25px
+  }
+  .faq h2 br {
+    display: none
+  }
+  .faq h2 em:before {
+    content: ' '
+  }
+  .faq summary {
+    font-size: 11px;
+    padding: 20px 0
+  }
+  .home footer>div:first-child {
+    padding-top: 32px
+  }
+  .home footer h2 {
+    font-size: 12px
+  }
+  .home footer ul {
+    font-size: 12px
+  }
+}
+@media(prefers-reduced-motion:reduce) {
+  .home *,.home *:before,.home *:after {
+    scroll-behavior: auto!important;
+    transition: none!important;
+    animation: none!important
+  }
+}
+.previewNotice {
+  padding: 11px 24px;
+  text-align: center;
+  background: #e2ece5;
+  border-bottom: 1px solid #c9d9cf;
+  color: #244e48;
+  font-size: 10px;
+  line-height: 1.8
+}
+.purchaseButton>button:disabled {
+  width: 100%;
+  min-height: 48px;
+  border-radius: 40px;
+  background: #dce4de;
+  color: #485c53;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: .03em;
+  padding: 12px 20px;
+  cursor: not-allowed
+}
+@media(max-width:767px) {
+  .trustStrip span {
+    font-size: 9px
+  }
+  .packOption small {
+    font-size: 10px
+  }
+  .packOption>span:nth-of-type(2) {
+    font-size: 14px
+  }
+  .campaignCommerce .button {
+    font-size: 10px
+  }
+  .campaignCommerce>small {
+    font-size: 10px
+  }
+  .benefitGrid article>p:not(.eyebrow),.productDescription,.faq summary {
+    font-size: 12px
+  }
+  .confidence a {
+    font-size: 10px
+  }
+  .checkoutNote {
+    font-size: 10px
+  }
+}

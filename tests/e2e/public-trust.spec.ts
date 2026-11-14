@@ -60,7 +60,7 @@ test("public footer and trust links are visible", async ({ page }) => {
   await expect(page.getByRole("link", { name: "Privacidad" })).toHaveAttribute("href", "/privacy");
   await expect(page.getByRole("link", { name: "Términos" })).toHaveAttribute("href", "/terms");
   await expect(page.getByRole("link", { name: "Envíos" })).toHaveAttribute("href", "/shipping");
-  await expect(page.getByRole("link", { name: "Cambios y devoluciones" })).toHaveAttribute("href", "/returns");
+  await expect(page.locator("footer").getByRole("link", { name: "Cambios y devoluciones" })).toHaveAttribute("href", "/returns");
   await expect(page.getByText("Pago seguro:")).toBeVisible();
 });
 

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { CampaignPrice } from "./suncare/campaign";
 import type { CatalogProduct } from "@/lib/catalog/types";
 import { AddToCartButton } from "./add-to-cart-button";
 
@@ -37,7 +38,7 @@ export function SummerDropCampaign({ product, dedicated = false }: {
           <div className="flex items-end justify-between gap-3 border-t border-[#123e40]/15 pt-4 md:block">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[.15em]">3 Luzelas</p>
-              <p className="mt-1 flex items-baseline gap-2"><span className="text-3xl font-medium tracking-tight sm:text-4xl">$769</span><span className="text-[10px]">MXN</span><span className="text-sm text-[#34585a] line-through" aria-label="Precio regular 819 pesos">$819</span></p>
+              <CampaignPrice product={product} />
             </div>
             <p className="pb-1 text-xs md:mt-2">Envío incluido.</p>
           </div>

@@ -1,10 +1,25 @@
 import { expect, test } from "@playwright/test";
 
 test.describe.configure({ mode: "serial" });
+test.skip(process.env.LUZELA_V4_READONLY_QA !== "1", "Requires the dedicated local read-only QA runtime.");
+
+// This suite requires scripts/qa/v4-readonly-runtime.cjs on the local server.
+// The browser submits only to this in-memory route, never to order creation.
+test.beforeEach(async ({ page }) => {
+  await page.route("**/api/analytics", route => route.fulfill({ status: 204 }));
+  await page.route("**/api/mercadopago/order", route => route.abort());
+  await page.route("**/api/checkout", async route => {
+    const body = route.request().postData() || "";
+    expect(body).toContain('name="analytics_is_qa"');
+    expect(body).toContain("true");
+    await route.fulfill({ status: 200, contentType: "application/json", body: JSON.stringify({url:"/checkout/payment?checkout_session=00000000-0000-4000-8000-000000000004"}) });
+  });
+});
 
 const qaEmail = `qa+funnel-${Date.now()}@example.com`;
 
 async function chooseSummer3x(page: import("@playwright/test").Page) {
+  await page.getByRole("radio", { name: /SUMMER 3X/ }).check();
   const product = page.locator('article[data-summer-pack="3x"]');
   await expect(product).toBeVisible();
   await product.scrollIntoViewIfNeeded();
@@ -20,7 +35,7 @@ async function reachCheckout(page: import("@playwright/test").Page) {
   await expect(page.getByRole("button", { name: /Continuar a pago seguro/i })).toBeEnabled();
 }
 
-test("QA storefront reaches a ready Card Brick without a payment", async ({ page }) => {
+test("QA storefront reaches a ready Card Brick with a local simulated checkout", async ({ page }) => {
   test.setTimeout(120_000);
   await page.goto("/?funnel_qa=1");
   await chooseSummer3x(page);
@@ -43,7 +58,8 @@ test("QA storefront reaches a ready Card Brick without a payment", async ({ page
     checkout: new URLSearchParams(location.search).get("checkout_session"),
   }));
   expect(result.session).toBe(initialSession);
-  console.log(`FUNNEL_QA ${JSON.stringify(result)}`);
+  await page.screenshot({path:"docs/qa/v4/card-brick-ready.png",fullPage:true});
+  expect(result.checkout).toBe("00000000-0000-4000-8000-000000000004");
 });
 
 test("Chavolines QA attribution persists to checkout without a payment", async ({ page }) => {
